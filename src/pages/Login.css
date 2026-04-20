@@ -3,9 +3,9 @@
 :root {
   --lumen-primary: #a3e635;
   --lumen-accent: #3b82f6;
-  --lumen-bg: #050505;
-  --glass-bg: rgba(255, 255, 255, 0.02);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --lumen-bg: var(--color-bg-main);
+  --glass-bg: var(--color-bg-card);
+  --glass-border: var(--color-border);
 }
 
 .auth-master-container {
@@ -111,12 +111,12 @@
   font-size: 34px;
   font-weight: 800;
   letter-spacing: -1.5px;
-  color: #fff;
+  color: var(--color-text-main);
   margin-bottom: 8px;
 }
 
 .auth-header p {
-  color: #a3a3a3;
+  color: var(--color-text-secondary);
   font-size: 15px;
   margin-bottom: 32px;
 }
@@ -145,16 +145,16 @@
 .auth-input-group label {
   font-size: 13px;
   font-weight: 600;
-  color: #737373;
+  color: var(--color-text-secondary);
   margin-left: 4px;
 }
 
 .auth-input-group input {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-bg-dark);
+  border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 16px;
-  color: #fff;
+  color: var(--color-text-main);
   font-size: 15px;
   transition: all 0.3s ease;
   outline: none;
@@ -168,8 +168,8 @@
 
 /* --- Buttons --- */
 .btn-main {
-  background: var(--lumen-primary);
-  color: #000;
+  background: var(--color-primary);
+  color: #213600;
   border: none;
   border-radius: 14px;
   padding: 16px;
@@ -191,9 +191,9 @@
 
 .btn-google {
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #fff;
+  background: var(--color-bg-dark);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
   border-radius: 14px;
   padding: 14px;
   font-size: 14px;
@@ -207,13 +207,13 @@
 }
 
 .btn-google:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--color-bg-subtle);
 }
 
 .btn-ghost {
   background: transparent;
-  color: #a3a3a3;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 14px;
   font-size: 14px;
@@ -226,8 +226,8 @@
 }
 
 .btn-ghost:hover {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-text-main);
+  border-color: var(--color-text-secondary);
 }
 
 /* --- Utilities --- */
