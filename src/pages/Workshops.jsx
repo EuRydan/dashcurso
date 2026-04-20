@@ -53,6 +53,7 @@ const MOCK_WORKSHOPS = [
   }
 ];
 
+const Workshops = () => {
   const [activeFilter, setActiveFilter] = useState('Todos');
   const [playingVideoId, setPlayingVideoId] = useState(null);
   const [seekTo, setSeekTo] = useState(null);
