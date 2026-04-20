@@ -71,23 +71,24 @@ const Profile = () => {
   };
 
   return (
-    <div className="page-container profile-page">
-      <header className="profile-header">
-        <div className="profile-header-left">
-          <div className="avatar-wrapper" onClick={handleAvatarClick} style={{ cursor: 'pointer' }}>
-             <img src={user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.name?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`} alt={user?.name} />
-             <div className="avatar-overlay">
-                <Camera size={20} />
-             </div>
-             <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                style={{ display: 'none' }} 
-                accept="image/*"
-             />
+    <div className="profile-page">
+      <header className="profile-hero glass-card">
+        <div className="hero-content">
+          <div className="avatar-big-wrapper" onClick={handleAvatarClick}>
+            <img src={user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.name?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`} alt="Profile" />
+            <div className="btn-edit-photo">
+              <Camera size={16} />
+              <span>Edit Photo</span>
+            </div>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+              style={{ display: 'none' }} 
+              accept="image/*"
+            />
           </div>
-          <div className="profile-header-info">
+          <div className="hero-text">
             {isEditing ? (
               <div className="edit-name-group">
                 <input 
@@ -106,65 +107,61 @@ const Profile = () => {
               </div>
             ) : (
               <div className="display-name-group" onClick={() => setIsEditing(true)}>
-                <h2>{user?.name || 'Estudante'}</h2>
-                <Edit2 size={14} className="edit-icon-hint" />
+                <h1>{user?.name || 'Alex Rivers'}</h1>
+                <Edit2 size={16} className="text-secondary" />
               </div>
             )}
-            <div className="profile-badges">
-              <span className="badge">Membro Premium</span>
-              <span className="bullet">•</span>
-              <span className="badge">Desde 2024</span>
-            </div>
+            <p className="text-secondary">Premium Student • Since 2024</p>
           </div>
         </div>
       </header>
 
-      <div className="profile-grid">
-        <div className="profile-col-left">
-          <section className="profile-section info-section">
-            <div className="section-header">
-              <h3>Informações Pessoais</h3>
-              <button className="btn-icon" onClick={() => setIsEditing(true)}>
-                <Edit2 size={16} />
-              </button>
-            </div>
-
-            <div className="info-list">
-              <div className="info-item">
-                <span className="info-label">Nome Completo</span>
-                <span className="info-value">{user?.name || 'Não definido'}</span>
+      <div className="profile-layout">
+        <section className="profile-main">
+          <div className="personal-info glass-card">
+            <h3>Personal Information</h3>
+            <div className="info-grid">
+              <div className="info-field">
+                <label>Full Name</label>
+                <span>{user?.name || 'Alex Rivers'}</span>
               </div>
-              <div className="info-item">
-                <span className="info-label">E-mail</span>
-                <span className="info-value">{user?.email}</span>
+              <div className="info-field">
+                <label>Email Address</label>
+                <span>{user?.email}</span>
               </div>
-              <div className="info-item">
-                <span className="info-label">Status da Conta</span>
-                <span className="info-value">Ativo</span>
+              <div className="info-field">
+                <label>Country / Region</label>
+                <span>Brazil</span>
               </div>
             </div>
-          </section>
-        </div>
+            <button className="btn-secondary" onClick={() => setIsEditing(true)}>Edit Details</button>
+          </div>
 
-        <div className="profile-col-right">
-          <section className="profile-section progress-section-empty">
-            <h3>Meu Progresso</h3>
-            <div className="empty-progress-msg">
-              <Award size={24} />
-              <p>Inicie um curso para ver seu progresso detalhado aqui.</p>
+          <div className="security-box glass-card">
+            <div className="security-text">
+              <h3>Security</h3>
+              <p className="text-secondary">Manage your password and account access.</p>
             </div>
-          </section>
+            <button className="btn-secondary" onClick={() => window.location.href='/settings'}>Change Password</button>
+          </div>
+        </section>
 
-          <section className="profile-section security-section">
-            <div className="security-info">
-               <div className="security-text">
-                 <h4>Segurança</h4>
-                 <p>Gerencie sua senha e acessos.</p>
-               </div>
-               <button className="btn-secondary" onClick={() => window.location.href='/settings'}>Mudar Senha</button>
+        <aside className="profile-sidebar">
+          <div className="progress-card glass-card shadow-neon">
+            <h3>My Progress</h3>
+            <div className="stats-row">
+              <div className="stat-item">
+                <span className="stat-value">65%</span>
+                <span className="stat-label">Course Progress</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">124h</span>
+                <span className="stat-label">Time Invested</span>
+              </div>
             </div>
-          </section>
-        </div>
+            <button className="btn-primary" onClick={() => window.location.href='/courses'}>Resume Learning</button>
+          </div>
+        </aside>
       </div>
     </div>
   );

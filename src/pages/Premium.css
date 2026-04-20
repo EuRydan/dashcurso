@@ -1,31 +1,40 @@
 .premium-page {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 100%;
+  gap: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 0;
+  animation: fadeIn 0.5s ease-out;
 }
 
 .premium-header {
   text-align: center;
-  max-width: 600px;
-  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
-.premium-header p {
-  color: var(--color-text-secondary);
-  font-size: 16px;
-  margin-top: 12px;
-  line-height: 1.5;
+.premium-header h1 {
+  font-size: 56px;
+  letter-spacing: -2px;
 }
 
 .billing-toggle {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 32px;
-  font-weight: 500;
+  gap: 20px;
+  padding: 12px 24px;
+  margin-top: 24px;
+  border-radius: 9999px;
+}
+
+.billing-toggle span {
+  font-size: 14px;
+  font-weight: 600;
   color: var(--color-text-secondary);
+  transition: var(--transition-smooth);
 }
 
 .billing-toggle span.active {
@@ -33,204 +42,125 @@
 }
 
 .discount-badge {
-  background-color: var(--color-primary);
-  color: #050505;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 12px;
-  margin-left: 8px;
-  text-transform: uppercase;
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  margin-left: 4px;
 }
 
-.toggle-switch {
-  width: 52px;
+.toggle-switch-billing {
+  width: 56px;
   height: 28px;
-  background-color: var(--color-bg-profile);
-  border: 1px solid var(--color-border);
-  border-radius: 20px;
+  background-color: var(--color-bg-sidebar);
+  border-radius: 9999px;
   position: relative;
   cursor: pointer;
-  transition: all 0.3s;
+  border: 1px solid var(--color-border);
 }
 
-.toggle-switch:hover {
-  border-color: var(--color-text-secondary);
-}
-
-.switch-knob {
-  width: 20px;
-  height: 20px;
-  background-color: var(--color-primary);
+.switch-thumb {
+  width: 22px;
+  height: 22px;
+  background-color: white;
   border-radius: 50%;
   position: absolute;
-  top: 3px;
-  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  top: 2px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.switch-knob.left {
-  transform: translateX(4px);
-}
-.switch-knob.right {
-  transform: translateX(26px);
-}
+.switch-thumb.left { left: 3px; }
+.switch-thumb.right { transform: translateX(26px); }
 
-.pricing-grid {
+/* Pricing Layout */
+.pricing-layout {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  width: 100%;
-  max-width: 1100px;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+@media (max-width: 1024px) {
+  .pricing-layout {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
 }
 
 .pricing-card {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border-card);
-  border-radius: 16px;
-  padding: 32px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
+  gap: 32px;
   position: relative;
-  transition: transform 0.3s;
-}
-
-.pricing-card:hover {
-  transform: translateY(-4px);
 }
 
 .pricing-card.featured {
-  border-color: var(--color-primary);
-  background-color: var(--color-bg-active);
-  box-shadow: 0 0 30px rgba(163, 230, 53, 0.1);
-  transform: scale(1.02);
+  transform: scale(1.05);
+  border-color: var(--color-primary-soft);
+  z-index: 2;
 }
 
-.pricing-card.featured:hover {
-  transform: scale(1.02) translateY(-4px);
+@media (max-width: 1024px) {
+  .pricing-card.featured {
+    transform: scale(1);
+  }
 }
 
-.popular-badge {
+.featured-tag {
   position: absolute;
-  top: -12px;
+  top: -14px;
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--color-primary);
-  color: #050505;
+  color: #1a2e05;
+  padding: 4px 12px;
+  border-radius: 9999px;
   font-size: 11px;
   font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
-.plan-header h3 {
+.plan-id h3 {
   font-size: 24px;
   margin-bottom: 8px;
 }
-.plan-header p {
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  line-height: 1.4;
-  height: 40px;
-}
 
 .plan-price {
-  margin: 32px 0;
   display: flex;
-  align-items: flex-end;
+  align-items: baseline;
+  gap: 4px;
 }
 
-.plan-price .currency {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  margin-bottom: 6px;
-  margin-right: 4px;
-}
-
-.plan-price .price {
+.price-val {
   font-size: 48px;
-  font-weight: 700;
-  letter-spacing: -2px;
-  line-height: 1;
+  font-weight: 800;
+  color: var(--color-text-main);
 }
 
-.plan-price .period {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin-bottom: 6px;
-}
-
-.plan-features {
+.feature-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  flex: 1;
-  margin-bottom: 40px;
+  list-style: none;
+  padding: 0;
 }
 
-.feature {
+.feature-list li {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--color-text-main);
-  font-weight: 500;
 }
 
-.feature.inactive {
+.feature-list li.locked {
   color: var(--color-text-secondary);
   opacity: 0.5;
 }
 
-.feature.inactive svg {
-  visibility: hidden;
-}
-
-.feature svg {
-  color: var(--color-primary);
-}
-
-.btn-plan {
-  width: 100%;
-  padding: 16px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.btn-plan.standard {
-  background-color: var(--color-bg-profile);
-  color: var(--color-text-main);
-  border: 1px solid var(--color-border);
-}
-
-.btn-plan.standard:hover {
-  background-color: var(--color-bg-subtle);
-}
-
-.btn-plan.accent {
-  background-color: var(--color-primary);
-  color: #050505;
-}
-
-.btn-plan.accent:hover {
-  background-color: var(--color-primary-dark);
-}
-
-@media (max-width: 900px) {
-  .pricing-grid {
-    grid-template-columns: 1fr;
-    max-width: 440px;
-  }
-  .pricing-card.featured {
-    transform: scale(1);
-  }
-  .pricing-card.featured:hover {
-    transform: translateY(-4px);
-  }
+.shadow-neon {
+  box-shadow: 0 0 50px rgba(163, 230, 53, 0.15);
 }

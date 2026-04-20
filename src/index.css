@@ -4,24 +4,26 @@
 :root {
   /* Colors */
   --color-bg-main: #131313;
-  --color-bg-dark: #0E0E0E;
+  --color-bg-sidebar: #0E0E0E;
   --color-bg-card: #1C1B1B;
-  --color-bg-card-hover: #262525;
-  --color-bg-active: #2A2A2A;
   --color-bg-profile: #1E1E1E;
+  --color-bg-active: #2A2A2A;
   --color-bg-subtle: #353534;
   
-  --color-primary: #A3E635; /* Lime green */
-  --color-primary-dark: #84C21D;
+  --color-primary: #A3E635; /* Neon Lime Green */
+  --color-primary-soft: rgba(163, 230, 53, 0.1);
   --color-text-main: #E5E2E1;
   --color-text-secondary: #C2CAB0;
   
   --color-border: rgba(66, 73, 54, 0.15);
-  --color-border-light: rgba(163, 230, 53, 0.1);
   --color-border-card: rgba(66, 73, 54, 0.1);
 
   --gradient-main: radial-gradient(circle at 50% 50%, #131313 0%, #0E0E0E 100%);
   --gradient-top: radial-gradient(circle at 50% 0%, #131313 0%, #0E0E0E 100%);
+  
+  /* Layout */
+  --sidebar-width: 256px;
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="light"] {
@@ -75,7 +77,7 @@ h1 {
   font-size: 56px;
   font-weight: 700;
   line-height: 1.25;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em; /* Figma: -2.5% */
 }
 
 @media (max-width: 768px) {
@@ -90,25 +92,42 @@ h2 {
   line-height: 1.33;
 }
 
-@media (max-width: 768px) {
-  h2 {
-    font-size: 20px;
-  }
-}
-
 h3 {
   font-size: 20px;
   font-weight: 600;
 }
 
 h4 {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
 }
 
 .caption {
   font-size: 12px;
   font-weight: 500;
+}
+
+/* Design Utilities */
+.glass-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+}
+
+.neon-shadow {
+  box-shadow: 0 0 20px rgba(163, 230, 53, 0.15);
+}
+
+.neon-glow {
+  filter: drop-shadow(0 0 8px var(--color-primary));
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
 }
 
 /* Base Layout utility */

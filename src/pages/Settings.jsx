@@ -50,130 +50,114 @@ const Settings = () => {
   }, []);
 
   return (
-    <div className="page-container settings-page">
-      <header className="page-header">
-        <h1>Configurações</h1>
-        <p className="page-subtitle">Gerencie suas preferências de segurança e notificações do sistema.</p>
+    <div className="settings-page">
+      <header className="settings-header">
+        <h1>Settings</h1>
+        <p className="text-secondary">Manage your security, notifications, and device sessions.</p>
       </header>
 
-      <div className="settings-grid-professional">
-        <div className="settings-col">
-          
-          <section className="settings-section">
-            <div className="section-header">
-              <Shield size={20} className="section-icon" />
-              <h3>Segurança e Senha</h3>
+      <div className="settings-layout">
+        <div className="settings-main">
+          <section className="settings-card glass-card">
+            <div className="card-header-icon">
+              <Shield size={20} className="text-primary" />
+              <h3>Security & Password</h3>
             </div>
-            <div className="section-content">
-              <form onSubmit={handlePasswordSubmit} className="password-form-clean">
-                <div className="form-row">
-                  <div className="input-field">
-                    <label>Senha Atual</label>
-                    <input 
-                      type="password" 
-                      placeholder="••••••••"
-                      value={password.current}
-                      onChange={(e) => setPassword({ ...password, current: e.target.value })}
-                    />
-                  </div>
+            <form onSubmit={handlePasswordSubmit} className="settings-form">
+              <div className="input-field">
+                <label>Current Password</label>
+                <input 
+                  type="password" 
+                  placeholder="••••••••"
+                  value={password.current}
+                  onChange={(e) => setPassword({ ...password, current: e.target.value })}
+                />
+              </div>
+              <div className="form-row">
+                <div className="input-field">
+                  <label>New Password</label>
+                  <input 
+                    type="password" 
+                    placeholder="Min. 8 characters"
+                    value={password.new}
+                    onChange={(e) => setPassword({ ...password, new: e.target.value })}
+                  />
                 </div>
-
-                <div className="form-row dual">
-                  <div className="input-field">
-                    <label>Nova Senha</label>
-                    <input 
-                      type="password" 
-                      placeholder="Mínimo 8 caracteres"
-                      value={password.new}
-                      onChange={(e) => setPassword({ ...password, new: e.target.value })}
-                    />
-                  </div>
-                  <div className="input-field">
-                    <label>Confirmar Senha</label>
-                    <input 
-                      type="password" 
-                      placeholder="Repita a nova senha"
-                      value={password.confirm}
-                      onChange={(e) => setPassword({ ...password, confirm: e.target.value })}
-                    />
-                  </div>
+                <div className="input-field">
+                  <label>Confirm Password</label>
+                  <input 
+                    type="password" 
+                    placeholder="Repeat new password"
+                    value={password.confirm}
+                    onChange={(e) => setPassword({ ...password, confirm: e.target.value })}
+                  />
                 </div>
+              </div>
+              <button 
+                type="submit" 
+                className="btn-primary"
+                disabled={isChangingPassword || !password.new}
+              >
+                {isChangingPassword ? 'Updating...' : 'Update Password'}
+              </button>
+            </form>
+          </section>
 
+          <section className="settings-card glass-card">
+            <div className="card-header-icon">
+              <Bell size={20} className="text-primary" />
+              <h3>Notifications</h3>
+            </div>
+            <div className="toggle-list">
+              <div className="toggle-item">
+                <div className="toggle-info">
+                  <h4>Email Notifications</h4>
+                  <p className="text-secondary">Get updates about new courses and workshops.</p>
+                </div>
                 <button 
-                   type="submit" 
-                   className="btn-settings-primary"
-                   disabled={isChangingPassword || !password.new}
+                  className={`toggle-switch ${emailNotifs ? 'active' : ''}`}
+                  onClick={() => setEmailNotifs(!emailNotifs)}
                 >
-                  {isChangingPassword ? 'Atualizando...' : 'Salvar Alterações'}
+                  <div className="switch-thumb" />
                 </button>
-                {passwordSuccess && (
-                  <div className="success-msg">
-                    <Check size={16} /> Senha atualizada com sucesso.
-                  </div>
-                )}
-              </form>
-            </div>
-          </section>
-
-          <section className="settings-section">
-             <div className="section-header">
-              <Bell size={20} className="section-icon" />
-              <h3>Notificações</h3>
-            </div>
-            <div className="section-content notif-list">
-               <div className="notif-item">
-                  <div className="notif-info">
-                    <h4>Novas Aulas e Atualizações</h4>
-                    <p>Receber e-mails sobre novos conteúdos.</p>
-                  </div>
-                  <button 
-                    className={'toggle-btn ' + (emailNotifs ? 'active' : '')}
-                    onClick={() => setEmailNotifs(!emailNotifs)}
-                  >
-                    <div className="toggle-thumb"></div>
-                  </button>
-               </div>
-
-               <div className="notif-item">
-                  <div className="notif-info">
-                    <h4>Avisos da Comunidade</h4>
-                    <p>Resumos diários de interações.</p>
-                  </div>
-                  <button 
-                    className={'toggle-btn ' + (communityNotifs ? 'active' : '')}
-                    onClick={() => setCommunityNotifs(!communityNotifs)}
-                  >
-                    <div className="toggle-thumb"></div>
-                  </button>
-               </div>
-            </div>
-          </section>
-
-        </div>
-
-        <div className="settings-col">
-          <section className="settings-section">
-            <div className="section-header">
-              <Monitor size={20} className="section-icon" />
-              <h3>Sessão Atual</h3>
-            </div>
-            <p className="section-desc-clean">Dispositivo identificado pelo sistema Lumen.</p>
-            
-            <div className="device-list">
-              <div className="device-item active-device">
-                <div className="device-icon">
-                  {deviceInfo.isMobile ? <Smartphone size={24} /> : <Monitor size={24} />}
+              </div>
+              <div className="toggle-item">
+                <div className="toggle-info">
+                  <h4>Community Updates</h4>
+                  <p className="text-secondary">Notifications about mentions and messages.</p>
                 </div>
-                <div className="device-info">
-                  <h4>{deviceInfo.browser} / {deviceInfo.os}</h4>
-                  <span>Online agora • Este dispositivo</span>
-                </div>
+                <button 
+                  className={`toggle-switch ${communityNotifs ? 'active' : ''}`}
+                  onClick={() => setCommunityNotifs(!communityNotifs)}
+                >
+                  <div className="switch-thumb" />
+                </button>
               </div>
             </div>
           </section>
         </div>
+
+        <aside className="settings-sidebar">
+          <section className="settings-card glass-card">
+            <div className="card-header-icon">
+              <Monitor size={20} className="text-primary" />
+              <h3>Active Session</h3>
+            </div>
+            <div className="device-card">
+              <div className="device-icon-box">
+                {deviceInfo.isMobile ? <Smartphone size={24} /> : <Monitor size={24} />}
+              </div>
+              <div className="device-details">
+                <h4>{deviceInfo.browser} on {deviceInfo.os}</h4>
+                <p className="text-primary">Online now • Current device</p>
+              </div>
+            </div>
+          </section>
+        </aside>
       </div>
     </div>
+  );
+};
   );
 };
 

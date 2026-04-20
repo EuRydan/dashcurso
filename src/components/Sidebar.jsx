@@ -20,12 +20,13 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
   return (
     <aside className={`sidebar ${isOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-top">
-        {/* Profile Info - REMOVIDO CONTAINER, APENAS OS ELEMENTOS */}
-        <div className="profile-raw-box">
-          <img src={avatarUrl} alt="Avatar" className="avatar" />
-          <div className="profile-text-only">
-            <span className="profile-name-clean">{displayName}</span>
-            <span className="profile-status-clean">Deep Work Mode</span>
+        <div className="profile-section">
+          <div className="profile-card">
+            <img src={avatarUrl} alt="Avatar" className="avatar" />
+            <div className="profile-info">
+              <span className="profile-name">{displayName}</span>
+              <span className="profile-status">Deep Work Mode</span>
+            </div>
           </div>
         </div>
 

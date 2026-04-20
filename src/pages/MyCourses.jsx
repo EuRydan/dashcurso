@@ -1,49 +1,70 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { BookOpen } from 'lucide-react';
+import { Play, Lock } from 'lucide-react';
 import './MyCourses.css';
 
 const MyCourses = () => {
-  const [progress, setProgress] = useState(0);
-  const [unlocked, setUnlocked] = useState(false);
-  const videoRef = useRef(null);
+  const [activeLesson, setActiveLesson] = useState(0);
 
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      const current = videoRef.current.currentTime;
-      const total = videoRef.current.duration;
-      if (total > 0) {
-        const percent = (current / total) * 100;
-        setProgress(Math.floor(percent));
-        
-        if (percent >= 70 && !unlocked) {
-          setUnlocked(true);
-          // Here we would typically update global state / API to unlock the certificate
-        }
-      }
-    }
-  };
-
+  const playlist = [
+    { title: 'Intro to Design Systems', duration: '12:45', completed: true },
+    { title: 'Foundations of Color', duration: '18:20', completed: true },
+    { title: 'Advanced Pattern Library', duration: '24:15', playing: true },
+    { title: 'Responsive Grids', duration: '15:10', locked: true },
+  ];
 
   return (
-    <div className="page-container course-page">
-      <header className="page-header text-glow">
-        <h1>Meus Cursos</h1>
-        <p className="page-subtitle">Gerencie seu progresso e acesso aos materiais exclusivos.</p>
-      </header>
-
-      <div className="content-grid-empty-aligned">
-        <div className="empty-state-card glass">
-           <div className="empty-icon-box">
-             <BookOpen size={32} strokeWidth={1.5} color="var(--color-text-secondary)" />
-           </div>
-           <h2>Nenhuma matrícula ativa</h2>
-           <p>Você não possui acesso a nenhum curso no momento. Quando você adquirir ou iniciar um módulo, ele aparecerá aqui com seu respectivo progresso.</p>
-           <div className="empty-actions">
-              <button className="btn-empty-primary" onClick={() => window.location.href='/workshops'}>
-                Assistir Workshops
-              </button>
-           </div>
+    <div className="course-page">
+      <section className="video-hero">
+        <div className="video-container">
+          <div className="video-placeholder">
+             {/* Simulação de Player de Vídeo */}
+             <Play size={64} className="text-primary" fill="currentColor" />
+          </div>
         </div>
+      </section>
+
+      <div className="course-layout">
+        <div className="course-main">
+          <header className="lesson-info">
+            <span className="module-tag">FOUNDATIONS MODULE</span>
+            <h1>Principles of Design Systems</h1>
+            <p className="lesson-meta">Lesson 4 of 12 • 45 minutes</p>
+          </header>
+
+          <div className="lesson-card glass-card">
+            <div className="card-header">
+              <h3>In Progress</h3>
+              <span className="text-primary">65% Completed</span>
+            </div>
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: '65%' }} />
+            </div>
+            <p className="card-desc">
+              In this session, we dive deep into the atomic principles that govern professional design systems.
+            </p>
+            <div className="card-actions">
+              <button className="btn-secondary">Previous Lesson</button>
+              <button className="btn-primary">Next Lesson</button>
+            </div>
+          </div>
+        </div>
+
+        <aside className="course-sidebar">
+          <h3>Module Playlist</h3>
+          <div className="playlist-list">
+            {playlist.map((item, i) => (
+              <div key={i} className={`playlist-item glass-card ${item.playing ? 'playing' : ''} ${item.locked ? 'locked' : ''}`}>
+                <div className="item-status">
+                  {item.locked ? <Lock size={16} /> : (item.completed ? <div className="dot-done" /> : <div className="dot-progress" />)}
+                </div>
+                <div className="item-info">
+                  <h4>{item.title}</h4>
+                  <span>{item.duration}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </aside>
       </div>
     </div>
   );
