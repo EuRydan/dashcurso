@@ -14,16 +14,19 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
     navigate('/login');
   };
 
-  const avatarUrl = user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.name?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`;
+  // Se o usuário não tiver nome definido, usa o email ou 'Estudante'
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Estudante';
+  const avatarUrl = user?.avatarBase64 || `https://ui-avatars.com/api/?name=${displayName.replace(' ', '+')}&background=353534&color=A3E635&size=128`;
 
   return (
     <aside className={`sidebar ${isOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-top">
-        <NavLink to="/profile" className="sidebar-profile-section" style={{ display: 'block', textDecoration: 'none' }} onClick={closeSidebar}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <img src={avatarUrl} alt={user?.name} className="avatar" />
+        {/* Profile Section - Sem container de caixa agora */}
+        <NavLink to="/profile" className="sidebar-profile-link" onClick={closeSidebar}>
+          <div className="profile-flex">
+            <img src={avatarUrl} alt={displayName} className="avatar" />
             <div className="profile-info">
-              <span className="profile-name">{user?.name || 'Alex Rivers'}</span>
+              <span className="profile-name">{displayName}</span>
               <span className="profile-status">Deep Work Mode</span>
             </div>
           </div>
@@ -54,12 +57,14 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
       </div>
 
       <div className="sidebar-bottom">
-        <NavLink to="/premium" className={({ isActive }) => 'nav-action premium-btn ' + (isActive ? 'active' : '')} style={{ color: 'var(--color-primary)', border: '1px solid var(--color-primary)', background: 'rgba(163,230,53,0.05)', marginBottom: '12px' }} onClick={closeSidebar}>
+        {/* Link de Upgrade Restaurado */}
+        <NavLink to="/premium" className={({ isActive }) => 'nav-action premium-btn ' + (isActive ? 'active' : '')} onClick={closeSidebar}>
           <Star size={18} fill="currentColor" />
           <span>Fazer upgrade</span>
         </NavLink>
         
-        <button className="nav-action" onClick={toggleTheme}>
+        {/* Dark/Light Mode Restaurado */}
+        <button className="nav-action theme-toggle" onClick={toggleTheme}>
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           <span>{theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}</span>
         </button>
