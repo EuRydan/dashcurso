@@ -23,42 +23,67 @@ export const AppProvider = ({ children }) => {
     document.documentElement.setAttribute('data-theme', 'dark');
   }, []);
 
-  // Auth Listener
+  // Auth Listener & Initialization
   useEffect(() => {
+    let isMounted = true;
+
     // Timeout de segurança: se o banco demorar mais de 6s, libera a tela
     const safetyTimeout = setTimeout(() => {
-      setLoading(false);
+      if (isMounted) setLoading(false);
     }, 6000);
 
-    const getInitialSession = async () => {
+    const initializeAuth = async () => {
       try {
+        // 1. Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
         
-        if (session) {
-          await fetchUserProfile(session.user);
-        } else {
+        if (session && isMounted) {
+          // IMPORTANT: Set basic user info immediately so AuthGuard doesn't redirect
+          const authUser = session.user;
+          setUser({
+            id: authUser.id,
+            email: authUser.email,
+            name: authUser.user_metadata?.full_name || authUser.email.split('@')[0],
+            avatarBase64: authUser.user_metadata?.avatar_url || null,
+            email_confirmed_at: authUser.email_confirmed_at
+          });
+          
+          // 2. Fetch profile in background to enrich
+          await fetchUserProfile(authUser);
+        } else if (isMounted) {
           setLoading(false);
         }
       } catch (err) {
-        console.error('Erro na sessão inicial:', err);
-        setLoading(false);
+        console.error('Erro na inicialização de Auth:', err);
+        if (isMounted) setLoading(false);
       }
     };
 
-    getInitialSession();
+    initializeAuth();
 
+    // 3. Listen for changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Evento de Auth:', event);
-      if (session) {
-        await fetchUserProfile(session.user);
-      } else if (event === 'SIGNED_OUT') {
+      if (session && isMounted) {
+        const authUser = session.user;
+        // Update user state immediately on sign in/refresh
+        setUser(prev => ({
+          ...prev,
+          id: authUser.id,
+          email: authUser.email,
+          name: authUser.user_metadata?.full_name || prev?.name || authUser.email.split('@')[0],
+          email_confirmed_at: authUser.email_confirmed_at
+        }));
+        await fetchUserProfile(authUser);
+      } else if (event === 'SIGNED_OUT' && isMounted) {
         setUser(null);
         setLoading(false);
       }
     });
 
     return () => {
+      isMounted = false;
       clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
@@ -82,7 +107,7 @@ export const AppProvider = ({ children }) => {
         email_confirmed_at: authUser.email_confirmed_at
       });
     } catch (err) {
-      console.error('Error fetching profile:', err);
+      console.error('Error fetching profile enrichment:', err);
     } finally {
       setLoading(false);
     }
