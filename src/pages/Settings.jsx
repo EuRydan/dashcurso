@@ -89,7 +89,7 @@ const Settings = () => {
                     <p>Receber e-mails do produtor sobre o curso principal.</p>
                   </div>
                   <button 
-                    className={\`toggle-btn \${emailNotifs ? 'active' : ''}\`}
+                    className={'toggle-btn ' + (emailNotifs ? 'active' : '')}
                     onClick={() => setEmailNotifs(!emailNotifs)}
                   >
                     <div className="toggle-thumb"></div>
@@ -102,7 +102,7 @@ const Settings = () => {
                     <p>Receber resumos diários de interações na comunidade.</p>
                   </div>
                   <button 
-                    className={\`toggle-btn \${communityNotifs ? 'active' : ''}\`}
+                    className={'toggle-btn ' + (communityNotifs ? 'active' : '')}
                     onClick={() => setCommunityNotifs(!communityNotifs)}
                   >
                     <div className="toggle-thumb"></div>

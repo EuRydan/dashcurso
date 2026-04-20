@@ -126,7 +126,7 @@ const Profile = () => {
                 <span className="info-label">Nome Completo</span>
                 {isEditing ? (
                   <>
-                    <input name="name" value={form.name} onChange={handleChange} className={\`profile-input \${errors.name ? 'error' : ''}\`} />
+                    <input name="name" value={form.name} onChange={handleChange} className={'profile-input ' + (errors.name ? 'error' : '')} />
                     {errors.name && <span className="input-error">{errors.name}</span>}
                   </>
                 ) : (
@@ -138,7 +138,7 @@ const Profile = () => {
                 <span className="info-label">Endereço de E-mail</span>
                 {isEditing ? (
                    <>
-                    <input name="email" value={form.email} onChange={handleChange} className={\`profile-input \${errors.email ? 'error' : ''}\`} />
+                    <input name="email" value={form.email} onChange={handleChange} className={'profile-input ' + (errors.email ? 'error' : '')} />
                     {errors.email && <span className="input-error">{errors.email}</span>}
                   </>
                 ) : (
@@ -150,7 +150,7 @@ const Profile = () => {
                 <span className="info-label">Número de Telefone</span>
                 {isEditing ? (
                   <>
-                    <input name="phone" value={form.phone} onChange={handleChange} className={\`profile-input \${errors.phone ? 'error' : ''}\`} />
+                    <input name="phone" value={form.phone} onChange={handleChange} className={'profile-input ' + (errors.phone ? 'error' : '')} />
                     {errors.phone && <span className="input-error">{errors.phone}</span>}
                   </>
                 ) : (
