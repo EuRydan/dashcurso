@@ -14,23 +14,20 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
     navigate('/login');
   };
 
-  // Se o usuário não tiver nome definido, usa o email ou 'Estudante'
-  const displayName = user?.name || user?.email?.split('@')[0] || 'Estudante';
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Alex Rivers';
   const avatarUrl = user?.avatarBase64 || `https://ui-avatars.com/api/?name=${displayName.replace(' ', '+')}&background=353534&color=A3E635&size=128`;
 
   return (
     <aside className={`sidebar ${isOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-top">
-        {/* Profile Section - Sem container de caixa agora */}
-        <NavLink to="/profile" className="sidebar-profile-link" onClick={closeSidebar}>
-          <div className="profile-flex">
-            <img src={avatarUrl} alt={displayName} className="avatar" />
-            <div className="profile-info">
-              <span className="profile-name">{displayName}</span>
-              <span className="profile-status">Deep Work Mode</span>
-            </div>
+        {/* Profile Info - REMOVIDO CONTAINER, APENAS OS ELEMENTOS */}
+        <div className="profile-raw-box">
+          <img src={avatarUrl} alt="Avatar" className="avatar" />
+          <div className="profile-text-only">
+            <span className="profile-name-clean">{displayName}</span>
+            <span className="profile-status-clean">Deep Work Mode</span>
           </div>
-        </NavLink>
+        </div>
 
         <nav className="nav-menu">
           <NavLink to="/" className={({ isActive }) => 'nav-link ' + (isActive ? 'active' : '')} onClick={closeSidebar}>
@@ -57,14 +54,12 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
       </div>
 
       <div className="sidebar-bottom">
-        {/* Link de Upgrade Restaurado */}
         <NavLink to="/premium" className={({ isActive }) => 'nav-action premium-btn ' + (isActive ? 'active' : '')} onClick={closeSidebar}>
           <Star size={18} fill="currentColor" />
           <span>Fazer upgrade</span>
         </NavLink>
         
-        {/* Dark/Light Mode Restaurado */}
-        <button className="nav-action theme-toggle" onClick={toggleTheme}>
+        <button className="nav-action" onClick={toggleTheme} type="button">
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           <span>{theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}</span>
         </button>
@@ -74,7 +69,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
           <span>Configurações</span>
         </NavLink>
         
-        <button className="nav-action" onClick={handleLogout}>
+        <button className="nav-action" onClick={handleLogout} type="button">
           <LogOut size={18} />
           <span>Sair</span>
         </button>
