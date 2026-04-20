@@ -38,13 +38,13 @@ const Sidebar = () => {
       </div>
 
       <div className="sidebar-bottom">
-        <button className="nav-action">
+        <NavLink to="/settings" className={({ isActive }) => 'nav-action ' + (isActive ? 'active' : '')}>
           <Settings size={18} />
-          <span>Settings</span>
-        </button>
+          <span>Configurações</span>
+        </NavLink>
         <button className="nav-action">
           <LogOut size={18} />
-          <span>Logout</span>
+          <span>Sair</span>
         </button>
       </div>
     </aside>
