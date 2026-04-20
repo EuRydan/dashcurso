@@ -146,7 +146,7 @@ const Login = () => {
                 />
                 {error && <div className="auth-error"><AlertCircle size={14}/> {error}</div>}
                 <button type="submit" className="btn-main" disabled={loading || magicCodeInput.length < 6}>
-                  {loading ? <div className="spinner-small"></div> : 'Entrar na Plataforma'}
+                  {loading ? <Loader2 className="spin" size={18}/> : 'Entrar na Plataforma'}
                 </button>
                 <button type="button" className="btn-text" onClick={() => setIsMagicFlow(false)}>Voltar</button>
               </form>

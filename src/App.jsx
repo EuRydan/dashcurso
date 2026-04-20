@@ -65,7 +65,7 @@ const AuthGuard = ({ children }) => {
   
   if (loading) return (
     <div className="loading-screen">
-       <div className="spinner-loader"></div>
+       <Loader2 className="spin" size={40} color="var(--color-primary)" />
     </div>
   );
 

@@ -312,15 +312,7 @@
 
 .btn-text:hover { color: #fff; }
 
-.spinner-small {
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(0,0,0,0.1);
-  border-top-color: #213600;
-  border-radius: 50%;
-  animation: spin-loader 1s linear infinite;
-}
-
+.spin { animation: spin-loader 1s infinite linear; }
 @keyframes spin-loader { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* --- Mobile Responsiveness --- */
