@@ -56,7 +56,7 @@ const Settings = () => {
         <p className="page-subtitle">Gerencie suas preferências de segurança e notificações do sistema.</p>
       </header>
 
-      <div className="settings-grid">
+      <div className="settings-grid-professional">
         <div className="settings-col">
           
           <section className="settings-section">
@@ -65,37 +65,46 @@ const Settings = () => {
               <h3>Segurança e Senha</h3>
             </div>
             <div className="section-content">
-              <form onSubmit={handlePasswordSubmit} className="password-form">
-                <div className="input-group">
-                  <label>Senha Atual</label>
-                  <input 
-                    type="password" 
-                    value={password.current}
-                    onChange={(e) => setPassword({ ...password, current: e.target.value })}
-                  />
+              <form onSubmit={handlePasswordSubmit} className="password-form-clean">
+                <div className="form-row">
+                  <div className="input-field">
+                    <label>Senha Atual</label>
+                    <input 
+                      type="password" 
+                      placeholder="••••••••"
+                      value={password.current}
+                      onChange={(e) => setPassword({ ...password, current: e.target.value })}
+                    />
+                  </div>
                 </div>
-                <div className="input-group">
-                  <label>Nova Senha</label>
-                  <input 
-                    type="password" 
-                    value={password.new}
-                    onChange={(e) => setPassword({ ...password, new: e.target.value })}
-                  />
+
+                <div className="form-row dual">
+                  <div className="input-field">
+                    <label>Nova Senha</label>
+                    <input 
+                      type="password" 
+                      placeholder="Mínimo 8 caracteres"
+                      value={password.new}
+                      onChange={(e) => setPassword({ ...password, new: e.target.value })}
+                    />
+                  </div>
+                  <div className="input-field">
+                    <label>Confirmar Senha</label>
+                    <input 
+                      type="password" 
+                      placeholder="Repita a nova senha"
+                      value={password.confirm}
+                      onChange={(e) => setPassword({ ...password, confirm: e.target.value })}
+                    />
+                  </div>
                 </div>
-                <div className="input-group">
-                  <label>Confirmar Nova Senha</label>
-                  <input 
-                    type="password" 
-                    value={password.confirm}
-                    onChange={(e) => setPassword({ ...password, confirm: e.target.value })}
-                  />
-                </div>
+
                 <button 
                    type="submit" 
                    className="btn-settings-primary"
                    disabled={isChangingPassword || !password.new}
                 >
-                  {isChangingPassword ? 'Atualizando...' : 'Atualizar Senha'}
+                  {isChangingPassword ? 'Atualizando...' : 'Salvar Alterações'}
                 </button>
                 {passwordSuccess && (
                   <div className="success-msg">
@@ -115,7 +124,7 @@ const Settings = () => {
                <div className="notif-item">
                   <div className="notif-info">
                     <h4>Novas Aulas e Atualizações</h4>
-                    <p>Receber e-mails do produtor sobre o curso principal.</p>
+                    <p>Receber e-mails sobre novos conteúdos.</p>
                   </div>
                   <button 
                     className={'toggle-btn ' + (emailNotifs ? 'active' : '')}
@@ -128,7 +137,7 @@ const Settings = () => {
                <div className="notif-item">
                   <div className="notif-info">
                     <h4>Avisos da Comunidade</h4>
-                    <p>Receber resumos diários de interações na comunidade.</p>
+                    <p>Resumos diários de interações.</p>
                   </div>
                   <button 
                     className={'toggle-btn ' + (communityNotifs ? 'active' : '')}
@@ -146,9 +155,9 @@ const Settings = () => {
           <section className="settings-section">
             <div className="section-header">
               <Monitor size={20} className="section-icon" />
-              <h3>Dispositivos Ativos</h3>
+              <h3>Sessão Atual</h3>
             </div>
-            <p className="section-desc">Seus dispositivos conectados recentemente na plataforma.</p>
+            <p className="section-desc-clean">Dispositivo identificado pelo sistema Lumen.</p>
             
             <div className="device-list">
               <div className="device-item active-device">
@@ -156,8 +165,8 @@ const Settings = () => {
                   {deviceInfo.isMobile ? <Smartphone size={24} /> : <Monitor size={24} />}
                 </div>
                 <div className="device-info">
-                  <h4>{deviceInfo.browser} no {deviceInfo.os}</h4>
-                  <span>Atual (Este dispositivo) • Identificado Pelo Sistema</span>
+                  <h4>{deviceInfo.browser} / {deviceInfo.os}</h4>
+                  <span>Online agora • Este dispositivo</span>
                 </div>
               </div>
             </div>

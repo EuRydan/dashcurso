@@ -1,24 +1,119 @@
-import React from 'react';
-import { Camera, Edit2, Shield, Lock, ExternalLink } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Camera, Edit2, Shield, Lock, ExternalLink, Save, X, Loader2 } from 'lucide-react';
+import { useAppContext } from '../components/AppContext';
+import { supabase } from '../lib/supabase';
 import './Profile.css';
 
 const Profile = () => {
+  const { user, refreshUser } = useAppContext();
+  const fileInputRef = useRef(null);
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState(user?.name || '');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleUpdateName = async () => {
+    if (!newName.trim()) return;
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          full_name: newName,
+          updated_at: new Date()
+        });
+
+      if (error) throw error;
+      await refreshUser();
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Error updating name:', err);
+      alert('Erro ao atualizar nome.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result;
+      
+      setIsSaving(true);
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .upsert({ 
+            id: user.id, 
+            avatar_url: base64String,
+            updated_at: new Date()
+          });
+
+        if (error) throw error;
+        await refreshUser();
+      } catch (err) {
+        console.error('Error updating avatar:', err);
+        alert('Erro ao atualizar foto.');
+      } finally {
+        setIsSaving(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="page-container profile-page">
       <header className="profile-header">
         <div className="profile-header-left">
-          <div className="avatar-wrapper">
-             <img src="https://ui-avatars.com/api/?name=Alex+Rivers&background=353534&color=A3E635&size=128" alt="Alex Rivers" />
-             <button className="btn-edit-avatar">
-               <Camera size={14} />
-             </button>
+          <div className="avatar-wrapper" onClick={handleAvatarClick} style={{ cursor: 'pointer' }}>
+             <img src={user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.name?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`} alt={user?.name} />
+             <div className="avatar-overlay">
+                <Camera size={20} />
+             </div>
+             <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileChange} 
+                style={{ display: 'none' }} 
+                accept="image/*"
+             />
           </div>
           <div className="profile-header-info">
-            <h2>Alex Rivers</h2>
+            {isEditing ? (
+              <div className="edit-name-group">
+                <input 
+                  type="text" 
+                  value={newName} 
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="edit-input"
+                  autoFocus
+                />
+                <button className="btn-save-mini" onClick={handleUpdateName} disabled={isSaving}>
+                  {isSaving ? <Loader2 className="spin" size={14} /> : <Save size={14} />}
+                </button>
+                <button className="btn-cancel-mini" onClick={() => setIsEditing(false)}>
+                  <X size={14} />
+                </button>
+              </div>
+            ) : (
+              <div className="display-name-group" onClick={() => setIsEditing(true)}>
+                <h2>{user?.name || 'Estudante'}</h2>
+                <Edit2 size={14} className="edit-icon-hint" />
+              </div>
+            )}
             <div className="profile-badges">
-              <span className="badge">Student</span>
+              <span className="badge">Membro Premium</span>
               <span className="bullet">•</span>
-              <span className="badge">Enrolled since Oct 2023</span>
+              <span className="badge">Desde 2024</span>
             </div>
           </div>
         </div>
@@ -28,96 +123,45 @@ const Profile = () => {
         <div className="profile-col-left">
           <section className="profile-section info-section">
             <div className="section-header">
-              <h3>Personal Information</h3>
-              <button className="btn-icon">
+              <h3>Informações Pessoais</h3>
+              <button className="btn-icon" onClick={() => setIsEditing(true)}>
                 <Edit2 size={16} />
               </button>
             </div>
 
             <div className="info-list">
               <div className="info-item">
-                <span className="info-label">Full Name</span>
-                <span className="info-value">Alex Rivers</span>
+                <span className="info-label">Nome Completo</span>
+                <span className="info-value">{user?.name || 'Não definido'}</span>
               </div>
               <div className="info-item">
-                <span className="info-label">Email Address</span>
-                <span className="info-value">alex.rivers@example.com</span>
+                <span className="info-label">E-mail</span>
+                <span className="info-value">{user?.email}</span>
               </div>
               <div className="info-item">
-                <span className="info-label">Phone Number</span>
-                <span className="info-value">+1 (555) 012-3456</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Organization</span>
-                <span className="info-value">Independent Scholar</span>
+                <span className="info-label">Status da Conta</span>
+                <span className="info-value">Ativo</span>
               </div>
             </div>
           </section>
         </div>
 
         <div className="profile-col-right">
-          <section className="profile-section progress-section">
-            <h3>My Progress</h3>
-            
-            <div className="progress-items">
-              <div className="progress-item">
-                <div className="progress-item-left">
-                  <div className="progress-item-info">
-                    <h4>UI/UX Advanced</h4>
-                    <span>65% Completed</span>
-                  </div>
-                  <div className="status-pill in-progress">
-                    <div className="dot"></div>
-                    In Progress
-                  </div>
-                </div>
-                <div className="progress-circle">
-                  {/* SVG Circle omitted for simplicity */}
-                  <span>65%</span>
-                </div>
-              </div>
-
-              <div className="progress-item">
-                <div className="progress-item-left">
-                  <div className="progress-item-info">
-                    <h4>Motion Design</h4>
-                    <span>20% Completed</span>
-                  </div>
-                  <div className="status-pill in-progress">
-                    <div className="dot"></div>
-                    In Progress
-                  </div>
-                </div>
-                <div className="progress-circle">
-                  <span>20%</span>
-                </div>
-              </div>
-
-              <div className="progress-item">
-                <div className="progress-item-left">
-                  <div className="progress-item-info">
-                    <h4>Foundations</h4>
-                    <span>100% Completed</span>
-                  </div>
-                  <div className="status-pill completed">
-                    <div className="check-icon">✓</div>
-                    Completed
-                  </div>
-                </div>
-                <div className="progress-circle full">
-                  <span>100%</span>
-                </div>
-              </div>
+          <section className="profile-section progress-section-empty">
+            <h3>Meu Progresso</h3>
+            <div className="empty-progress-msg">
+              <Award size={24} />
+              <p>Inicie um curso para ver seu progresso detalhado aqui.</p>
             </div>
           </section>
 
           <section className="profile-section security-section">
             <div className="security-info">
                <div className="security-text">
-                 <h4>Security</h4>
-                 <p>Manage your password and account access.</p>
+                 <h4>Segurança</h4>
+                 <p>Gerencie sua senha e acessos.</p>
                </div>
-               <button className="btn-secondary">Change Password</button>
+               <button className="btn-secondary" onClick={() => window.location.href='/settings'}>Mudar Senha</button>
             </div>
           </section>
         </div>
@@ -127,3 +171,4 @@ const Profile = () => {
 };
 
 export default Profile;
+e;

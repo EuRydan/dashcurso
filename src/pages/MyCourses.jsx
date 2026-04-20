@@ -23,25 +23,17 @@ const MyCourses = () => {
     }
   };
 
-  // Mock playlist data
-  const playlist = [
-    { title: '1. Introduction to Tokens', time: '8:45', status: 'Completed' },
-    { title: '2. Color Psychology', time: '15:20', status: 'Completed' },
-    { title: '3. Typography Hierarchy', time: '11:10', status: 'Completed' },
-    { title: '4. Design Systems', time: '14:10', status: 'Playing' },
-    { title: '5. Advanced Components', time: '22:00', status: 'Locked' },
-  ];
 
   return (
     <div className="page-container course-page">
-      <div className="page-header" style={{ marginBottom: '32px' }}>
-        <h1 style={{ color: 'var(--color-text-main)', fontSize: '32px', marginBottom: '8px' }}>Meus Cursos</h1>
-        <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px' }}>Gerencie seu progresso e acesso aos materiais.</p>
-      </div>
+      <header className="page-header text-glow">
+        <h1>Meus Cursos</h1>
+        <p className="page-subtitle">Gerencie seu progresso e acesso aos materiais exclusivos.</p>
+      </header>
 
-      <div className="content-grid-empty" style={{ gridTemplateColumns: '1fr' }}>
+      <div className="content-grid-empty-aligned">
         <div className="empty-state-card glass">
-           <div className="empty-icon-box" style={{ backgroundColor: 'transparent', border: '1px dashed var(--color-border)' }}>
+           <div className="empty-icon-box">
              <BookOpen size={32} strokeWidth={1.5} color="var(--color-text-secondary)" />
            </div>
            <h2>Nenhuma matrícula ativa</h2>
