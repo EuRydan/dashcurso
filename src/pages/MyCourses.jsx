@@ -5,64 +5,73 @@ import './MyCourses.css';
 const MyCourses = () => {
   const [activeLesson, setActiveLesson] = useState(0);
 
-  const playlist = [
-    { title: 'Intro to Design Systems', duration: '12:45', completed: true },
-    { title: 'Foundations of Color', duration: '18:20', completed: true },
-    { title: 'Advanced Pattern Library', duration: '24:15', playing: true },
-    { title: 'Responsive Grids', duration: '15:10', locked: true },
-  ];
+  const playlist = [];
 
   return (
     <div className="course-page">
       <section className="video-hero">
         <div className="video-container">
           <div className="video-placeholder">
-             {/* Simulação de Player de Vídeo */}
-             <Play size={64} className="text-primary" fill="currentColor" />
+             {/* Simulação de Player de Vídeo Vazio */}
+             <Play size={64} className="text-secondary" opacity={0.3} />
+             <p className="text-secondary" style={{ marginTop: '16px' }}>Selecione uma aula para começar</p>
           </div>
         </div>
       </section>
 
       <div className="course-layout">
         <div className="course-main">
-          <header className="lesson-info">
-            <span className="module-tag">FOUNDATIONS MODULE</span>
-            <h1>Principles of Design Systems</h1>
-            <p className="lesson-meta">Lesson 4 of 12 • 45 minutes</p>
-          </header>
+          {playlist.length > 0 ? (
+            <>
+              <header className="lesson-info">
+                <span className="module-tag">MÓDULO ATUAL</span>
+                <h1>Título da Aula</h1>
+                <p className="lesson-meta">Aula 0 de 0 • 0 minutos</p>
+              </header>
 
-          <div className="lesson-card glass-card">
-            <div className="card-header">
-              <h3>In Progress</h3>
-              <span className="text-primary">65% Completed</span>
+              <div className="lesson-card glass-card">
+                <div className="card-header">
+                  <h3>Em Progresso</h3>
+                  <span className="text-primary">0% concluído</span>
+                </div>
+                <div className="progress-track">
+                  <div className="progress-fill" style={{ width: '0%' }} />
+                </div>
+                <p className="card-desc">
+                  Selecione um curso no catálogo para ver o conteúdo detalhado aqui.
+                </p>
+                <div className="card-actions">
+                  <button className="btn-secondary">Aula Anterior</button>
+                  <button className="btn-primary">Próxima Aula</button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="empty-state-minimal" style={{ textAlign: 'left' }}>
+              <h2 className="text-secondary">Nenhuma aula ativa</h2>
+              <p className="text-secondary">O conteúdo das aulas aparecerá aqui assim que você iniciar um curso.</p>
             </div>
-            <div className="progress-track">
-              <div className="progress-fill" style={{ width: '65%' }} />
-            </div>
-            <p className="card-desc">
-              In this session, we dive deep into the atomic principles that govern professional design systems.
-            </p>
-            <div className="card-actions">
-              <button className="btn-secondary">Previous Lesson</button>
-              <button className="btn-primary">Next Lesson</button>
-            </div>
-          </div>
+          )}
         </div>
 
         <aside className="course-sidebar">
-          <h3>Module Playlist</h3>
+          <h3>Playlist do Módulo</h3>
           <div className="playlist-list">
-            {playlist.map((item, i) => (
-              <div key={i} className={`playlist-item glass-card ${item.playing ? 'playing' : ''} ${item.locked ? 'locked' : ''}`}>
-                <div className="item-status">
-                  {item.locked ? <Lock size={16} /> : (item.completed ? <div className="dot-done" /> : <div className="dot-progress" />)}
+            {playlist.length > 0 ? (
+              playlist.map((item, i) => (
+                <div key={i} className={`playlist-item glass-card ${item.playing ? 'playing' : ''} ${item.locked ? 'locked' : ''}`}>
+                  <div className="item-status">
+                    {item.locked ? <Lock size={16} /> : (item.completed ? <div className="dot-done" /> : <div className="dot-progress" />)}
+                  </div>
+                  <div className="item-info">
+                    <h4>{item.title}</h4>
+                    <span>{item.duration}</span>
+                  </div>
                 </div>
-                <div className="item-info">
-                  <h4>{item.title}</h4>
-                  <span>{item.duration}</span>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-secondary" style={{ fontSize: '14px', marginTop: '12px' }}>Lista vazia.</p>
+            )}
           </div>
         </aside>
       </div>

@@ -8,7 +8,7 @@ export const useAppContext = () => useContext(AppContext);
 
 export const AppProvider = ({ children }) => {
   // Theme State
-  const [theme, setTheme] = useState(localStorage.getItem('lumen_theme') || 'dark');
+  const [theme] = useState('dark');
   
   // User State
   const [user, setUser] = useState(null);
@@ -20,9 +20,8 @@ export const AppProvider = ({ children }) => {
 
   // Update DOM Theme & Persistence
   useEffect(() => {
-    localStorage.setItem('lumen_theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }, []);
 
   // Auth Listener
   useEffect(() => {
@@ -100,8 +99,8 @@ export const AppProvider = ({ children }) => {
 
   return (
     <AppContext.Provider value={{
-      theme,
-      toggleTheme,
+      theme: 'dark',
+      toggleTheme: () => {}, // Disable toggle
       user,
       refreshUser,
       loading

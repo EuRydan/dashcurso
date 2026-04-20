@@ -7,77 +7,67 @@ const Home = () => {
   const { user } = useAppContext();
   const firstName = user?.name ? user.name.split(' ')[0] : 'Alex';
   
-  // Mock data para fidelidade ao Figma (Sistema cru mas funcional)
-  const continueWatching = [
-    {
-      id: 1,
-      title: 'UI/UX Advanced',
-      module: 'Module 4: Component Architecture',
-      progress: 65,
-      image: 'uiux-thumb'
-    },
-    {
-      id: 2,
-      title: 'Motion Design',
-      module: 'Module 1: Easing Basics',
-      progress: 20,
-      image: 'motion-thumb'
-    }
-  ];
-
-  const modules = [
-    { title: 'Foundations', lessons: 5, locked: false },
-    { title: 'Advanced Patterns', lessons: 8, locked: true },
-    { title: 'Design Systems', lessons: 12, locked: true },
-  ];
+  // Sistema cru: sem dados iniciais
+  const continueWatching = [];
+  const modules = [];
 
   return (
     <div className="home-page">
       <header className="home-header">
-        <h1>Continue watching, {firstName}</h1>
+        <h1>Bem-vindo, {firstName}</h1>
       </header>
 
-      <section className="bento-grid">
-        {continueWatching.map(course => (
-          <div key={course.id} className="bento-card glass-card">
-            <div className="bento-card-header">
-              <div className={`thumb-placeholder ${course.image}`} />
-              <div className="bento-text">
-                <h3>{course.title}</h3>
-                <p>{course.module}</p>
-                <span className="progress-tag">{course.progress}% Complete</span>
-              </div>
-            </div>
-            <div className="bento-card-footer">
-              <div className="progress-bar-bg">
-                <div className="progress-bar-fill" style={{ width: `${course.progress}%` }} />
-              </div>
-              <button className="btn-watch-bento">
-                <Play size={14} fill="currentColor" />
-                <span>Watch</span>
-              </button>
-            </div>
-          </div>
-        ))}
-      </section>
-
-      <section className="modules-section">
-        <h2>All Modules</h2>
-        <div className="modules-list">
-          {modules.map((m, i) => (
-            <div key={i} className={`module-item glass-card ${m.locked ? 'locked' : ''}`}>
-              <div className="module-left">
-                <div className="module-icon">
-                   {m.locked ? <Lock size={20} /> : <PlayCircle size={20} className="text-primary" />}
-                </div>
-                <div className="module-info">
-                  <h4>{m.title}</h4>
-                  <p>{m.lessons} lessons</p>
+      {continueWatching.length > 0 ? (
+        <section className="bento-grid">
+          {continueWatching.map(course => (
+            <div key={course.id} className="bento-card glass-card">
+              <div className="bento-card-header">
+                <div className={`thumb-placeholder ${course.image}`} />
+                <div className="bento-text">
+                  <h3>{course.title}</h3>
+                  <p>{course.module}</p>
+                  <span className="progress-tag">{course.progress}% concluído</span>
                 </div>
               </div>
-              {!m.locked && <button className="btn-module-action">Play</button>}
+              <div className="bento-card-footer">
+                <div className="progress-bar-bg">
+                  <div className="progress-bar-fill" style={{ width: `${course.progress}%` }} />
+                </div>
+                <button className="btn-watch-bento">
+                  <Play size={14} fill="currentColor" />
+                  <span>Assistir</span>
+                </button>
+              </div>
             </div>
           ))}
+        </section>
+      ) : (
+        <div className="empty-state-minimal">
+          <p>Você não possui cursos ativos no momento.</p>
+        </div>
+      )}
+
+      <section className="modules-section">
+        <h2>Todos os Módulos</h2>
+        <div className="modules-list">
+          {modules.length > 0 ? (
+            modules.map((m, i) => (
+              <div key={i} className={`module-item glass-card ${m.locked ? 'locked' : ''}`}>
+                <div className="module-left">
+                  <div className="module-icon">
+                    {m.locked ? <Lock size={20} /> : <PlayCircle size={20} className="text-primary" />}
+                  </div>
+                  <div className="module-info">
+                    <h4>{m.title}</h4>
+                    <p>{m.lessons} aulas</p>
+                  </div>
+                </div>
+                {!m.locked && <button className="btn-module-action">Play</button>}
+              </div>
+            ))
+          ) : (
+            <p className="text-secondary" style={{ fontSize: '14px' }}>Nenhum módulo disponível.</p>
+          )}
         </div>
       </section>
     </div>

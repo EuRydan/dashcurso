@@ -60,11 +60,6 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
           <span>Fazer upgrade</span>
         </NavLink>
         
-        <button className="nav-action" onClick={toggleTheme} type="button">
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          <span>{theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}</span>
-        </button>
-        
         <NavLink to="/settings" className={({ isActive }) => 'nav-action ' + (isActive ? 'active' : '')} onClick={closeSidebar}>
           <Settings size={18} />
           <span>Configurações</span>

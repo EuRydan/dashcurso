@@ -8,18 +8,18 @@ const Premium = () => {
   return (
     <div className="premium-page">
       <header className="premium-header">
-        <span className="text-primary font-bold tracking-widest text-xs">GO UNLIMITED</span>
-        <h1>Unlock Your Full Potential</h1>
+        <span className="text-primary font-bold tracking-widest text-xs">ACESSO TOTAL</span>
+        <h1>Desbloqueie seu Potencial</h1>
         <p className="text-secondary text-lg max-w-2xl mx-auto">
-          Accelerate your career with elite resources, mentorship, and lifetime access to advanced design and code strategies.
+          Acelere sua carreira com recursos de elite, mentorias e acesso vitalício a estratégias avançadas de design e código.
         </p>
         
         <div className="billing-toggle glass-card">
-          <span className={!isAnnual ? 'active' : ''}>Monthly</span>
+          <span className={!isAnnual ? 'active' : ''}>Mensal</span>
           <div className="toggle-switch-billing" onClick={() => setIsAnnual(!isAnnual)}>
              <div className={`switch-thumb ${isAnnual ? 'right' : 'left'}`}></div>
           </div>
-          <span className={isAnnual ? 'active' : ''}>Annual <span className="discount-badge">Save 20%</span></span>
+          <span className={isAnnual ? 'active' : ''}>Anual <span className="discount-badge">Eco. 20%</span></span>
         </div>
       </header>
 
@@ -27,54 +27,54 @@ const Premium = () => {
         <div className="pricing-card glass-card">
           <div className="plan-id">
             <h3>Starter</h3>
-            <p className="text-secondary">Basic foundations for early learners.</p>
+            <p className="text-secondary">Fundamentos básicos para iniciantes.</p>
           </div>
           <div className="plan-price">
             <span className="price-val">R${isAnnual ? '49' : '59'}</span>
-            <span className="text-secondary">/mo</span>
+            <span className="text-secondary">/mês</span>
           </div>
           <ul className="feature-list">
-            <li><Check size={16} className="text-primary" /> Basic Course Access</li>
-            <li><Check size={16} className="text-primary" /> Digital Certificates</li>
-            <li className="locked"><X size={16} /> Live Mentorship</li>
+            <li><Check size={16} className="text-primary" /> Acesso ao Curso Básico</li>
+            <li><Check size={16} className="text-primary" /> Certificados Digitais</li>
+            <li className="locked"><X size={16} /> Mentorias ao Vivo</li>
           </ul>
-          <button className="btn-secondary w-full">Join Starter</button>
+          <button className="btn-secondary w-full">Assinar Starter</button>
         </div>
 
         <div className="pricing-card glass-card featured shadow-neon">
-          <div className="featured-tag">MOST POPULAR</div>
+          <div className="featured-tag">MAIS POPULAR</div>
           <div className="plan-id">
-            <h3>Professional</h3>
-            <p className="text-secondary">Full arsenal for high-level careers.</p>
+            <h3>Profissional</h3>
+            <p className="text-secondary">Arsenal completo para carreiras de alto nível.</p>
           </div>
           <div className="plan-price">
             <span className="price-val">R${isAnnual ? '79' : '99'}</span>
-            <span className="text-secondary">/mo</span>
+            <span className="text-secondary">/mês</span>
           </div>
           <ul className="feature-list">
-            <li><Check size={16} className="text-primary" /> Advanced Masters Track</li>
-            <li><Check size={16} className="text-primary" /> Physical Certificates</li>
-            <li><Check size={16} className="text-primary" /> Weekly Live Sessions</li>
-            <li><Check size={16} className="text-primary" /> Exclusive Plugins</li>
+            <li><Check size={16} className="text-primary" /> Trilha Masters Avançada</li>
+            <li><Check size={16} className="text-primary" /> Certificados Físicos</li>
+            <li><Check size={16} className="text-primary" /> Sessões Semanais ao Vivo</li>
+            <li><Check size={16} className="text-primary" /> Plugins Exclusivos</li>
           </ul>
-          <button className="btn-primary w-full">Go Professional</button>
+          <button className="btn-primary w-full">Assinar Profissional</button>
         </div>
 
         <div className="pricing-card glass-card">
           <div className="plan-id">
             <h3>Elite</h3>
-            <p className="text-secondary">Dedicated access for team leaders.</p>
+            <p className="text-secondary">Acesso dedicado para líderes de equipe.</p>
           </div>
           <div className="plan-price">
             <span className="price-val">R${isAnnual ? '159' : '199'}</span>
-            <span className="text-secondary">/mo</span>
+            <span className="text-secondary">/mês</span>
           </div>
           <ul className="feature-list">
-            <li><Check size={16} className="text-primary" /> All Pro Features</li>
-            <li><Check size={16} className="text-primary" /> 1-on-1 Strategy Calls</li>
-            <li><Check size={16} className="text-primary" /> Code Review Access</li>
+            <li><Check size={16} className="text-primary" /> Todos os recursos Pro</li>
+            <li><Check size={16} className="text-primary" /> Calls Estratégicas 1-em-1</li>
+            <li><Check size={16} className="text-primary" /> Acesso a Review de Código</li>
           </ul>
-          <button className="btn-secondary w-full">Join Elite</button>
+          <button className="btn-secondary w-full">Assinar Elite</button>
         </div>
       </div>
     </div>

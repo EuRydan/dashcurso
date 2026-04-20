@@ -52,8 +52,8 @@ const Settings = () => {
   return (
     <div className="settings-page">
       <header className="settings-header">
-        <h1>Settings</h1>
-        <p className="text-secondary">Manage your security, notifications, and device sessions.</p>
+        <h1>Configurações</h1>
+        <p className="text-secondary">Gerencie sua segurança, notificações e sessões de dispositivos.</p>
       </header>
 
       <div className="settings-layout">
@@ -61,11 +61,11 @@ const Settings = () => {
           <section className="settings-card glass-card">
             <div className="card-header-icon">
               <Shield size={20} className="text-primary" />
-              <h3>Security & Password</h3>
+              <h3>Segurança e Senha</h3>
             </div>
             <form onSubmit={handlePasswordSubmit} className="settings-form">
               <div className="input-field">
-                <label>Current Password</label>
+                <label>Senha Atual</label>
                 <input 
                   type="password" 
                   placeholder="••••••••"
@@ -75,19 +75,19 @@ const Settings = () => {
               </div>
               <div className="form-row">
                 <div className="input-field">
-                  <label>New Password</label>
+                  <label>Nova Senha</label>
                   <input 
                     type="password" 
-                    placeholder="Min. 8 characters"
+                    placeholder="Mín. 8 caracteres"
                     value={password.new}
                     onChange={(e) => setPassword({ ...password, new: e.target.value })}
                   />
                 </div>
                 <div className="input-field">
-                  <label>Confirm Password</label>
+                  <label>Confirmar Senha</label>
                   <input 
                     type="password" 
-                    placeholder="Repeat new password"
+                    placeholder="Repita a nova senha"
                     value={password.confirm}
                     onChange={(e) => setPassword({ ...password, confirm: e.target.value })}
                   />
@@ -98,7 +98,7 @@ const Settings = () => {
                 className="btn-primary"
                 disabled={isChangingPassword || !password.new}
               >
-                {isChangingPassword ? 'Updating...' : 'Update Password'}
+                {isChangingPassword ? 'Atualizando...' : 'Atualizar Senha'}
               </button>
             </form>
           </section>
@@ -106,13 +106,13 @@ const Settings = () => {
           <section className="settings-card glass-card">
             <div className="card-header-icon">
               <Bell size={20} className="text-primary" />
-              <h3>Notifications</h3>
+              <h3>Notificações</h3>
             </div>
             <div className="toggle-list">
               <div className="toggle-item">
                 <div className="toggle-info">
-                  <h4>Email Notifications</h4>
-                  <p className="text-secondary">Get updates about new courses and workshops.</p>
+                  <h4>Notificações por E-mail</h4>
+                  <p className="text-secondary">Receba atualizações sobre novos cursos e workshops.</p>
                 </div>
                 <button 
                   className={`toggle-switch ${emailNotifs ? 'active' : ''}`}
@@ -123,8 +123,8 @@ const Settings = () => {
               </div>
               <div className="toggle-item">
                 <div className="toggle-info">
-                  <h4>Community Updates</h4>
-                  <p className="text-secondary">Notifications about mentions and messages.</p>
+                  <h4>Atualizações da Comunidade</h4>
+                  <p className="text-secondary">Avisos sobre menções e mensagens.</p>
                 </div>
                 <button 
                   className={`toggle-switch ${communityNotifs ? 'active' : ''}`}
@@ -141,7 +141,7 @@ const Settings = () => {
           <section className="settings-card glass-card">
             <div className="card-header-icon">
               <Monitor size={20} className="text-primary" />
-              <h3>Active Session</h3>
+              <h3>Sessão Ativa</h3>
             </div>
             <div className="device-card">
               <div className="device-icon-box">

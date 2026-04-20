@@ -78,7 +78,7 @@ const Profile = () => {
             <img src={user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.name?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`} alt="Profile" />
             <div className="btn-edit-photo">
               <Camera size={16} />
-              <span>Edit Photo</span>
+              <span>Alterar Foto</span>
             </div>
             <input 
               type="file" 
@@ -111,7 +111,7 @@ const Profile = () => {
                 <Edit2 size={16} className="text-secondary" />
               </div>
             )}
-            <p className="text-secondary">Premium Student • Since 2024</p>
+            <p className="text-secondary">Estudante • Desde 2026</p>
           </div>
         </div>
       </header>
@@ -119,47 +119,47 @@ const Profile = () => {
       <div className="profile-layout">
         <section className="profile-main">
           <div className="personal-info glass-card">
-            <h3>Personal Information</h3>
+            <h3>Informações Pessoais</h3>
             <div className="info-grid">
               <div className="info-field">
-                <label>Full Name</label>
-                <span>{user?.name || 'Alex Rivers'}</span>
+                <label>Nome Completo</label>
+                <span>{user?.name || 'Não informado'}</span>
               </div>
               <div className="info-field">
-                <label>Email Address</label>
+                <label>Endereço de E-mail</label>
                 <span>{user?.email}</span>
               </div>
               <div className="info-field">
-                <label>Country / Region</label>
-                <span>Brazil</span>
+                <label>País / Região</label>
+                <span>Brasil</span>
               </div>
             </div>
-            <button className="btn-secondary" onClick={() => setIsEditing(true)}>Edit Details</button>
+            <button className="btn-secondary" onClick={() => setIsEditing(true)}>Editar Detalhes</button>
           </div>
 
           <div className="security-box glass-card">
             <div className="security-text">
-              <h3>Security</h3>
-              <p className="text-secondary">Manage your password and account access.</p>
+              <h3>Segurança</h3>
+              <p className="text-secondary">Gerencie sua senha e acessos da conta.</p>
             </div>
-            <button className="btn-secondary" onClick={() => window.location.href='/settings'}>Change Password</button>
+            <button className="btn-secondary" onClick={() => window.location.href='/settings'}>Alterar Senha</button>
           </div>
         </section>
 
         <aside className="profile-sidebar">
           <div className="progress-card glass-card shadow-neon">
-            <h3>My Progress</h3>
+            <h3>Meu Progresso</h3>
             <div className="stats-row">
               <div className="stat-item">
-                <span className="stat-value">65%</span>
-                <span className="stat-label">Course Progress</span>
+                <span className="stat-value">0%</span>
+                <span className="stat-label">Progresso Geral</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">124h</span>
-                <span className="stat-label">Time Invested</span>
+                <span className="stat-value">0h</span>
+                <span className="stat-label">Tempo Investido</span>
               </div>
             </div>
-            <button className="btn-primary" onClick={() => window.location.href='/courses'}>Resume Learning</button>
+            <button className="btn-primary" onClick={() => window.location.href='/courses'}>Começar a Estudar</button>
           </div>
         </aside>
       </div>
