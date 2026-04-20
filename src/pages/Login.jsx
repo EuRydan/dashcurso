@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, ArrowRight, Github, Chrome, AlertCircle } from 'lucide-react';
+import { Mail, ArrowRight, AlertCircle, Circle } from 'lucide-react';
 import './Login.css';
 
 const Login = () => {
@@ -55,11 +55,11 @@ const Login = () => {
 
         <div className="social-login">
           <button className="btn-social" onClick={handleSocialLogin} disabled={loading}>
-            <Chrome size={20} />
+            <Circle size={20} />
             Entrar com Google
           </button>
           <button className="btn-social" onClick={handleSocialLogin} disabled={loading}>
-            <Github size={20} />
+            <Circle size={20} />
             Entrar com Github
           </button>
         </div>
