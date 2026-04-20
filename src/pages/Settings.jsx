@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Monitor, Smartphone, Bell, Mail, Shield, Check } from 'lucide-react';
 import './Settings.css';
 
@@ -19,6 +19,35 @@ const Settings = () => {
       setTimeout(() => setPasswordSuccess(false), 3000);
     }, 1200);
   };
+
+  const [deviceInfo, setDeviceInfo] = useState({ os: 'Desconhecido', browser: 'Desconhecido', isMobile: false });
+
+  useEffect(() => {
+    const parseUserAgent = () => {
+      const ua = navigator.userAgent;
+      let os = "Sistema Desconhecido";
+      let browser = "Navegador Desconhecido";
+      let isMobile = false;
+
+      // OS detection
+      if (ua.indexOf("Win") !== -1) os = "Windows";
+      else if (ua.indexOf("Mac") !== -1) os = "MacOS";
+      else if (ua.indexOf("X11") !== -1 || ua.indexOf("Linux") !== -1) os = "Linux";
+      else if (ua.indexOf("Android") !== -1) { os = "Android"; isMobile = true; }
+      else if (ua.indexOf("like Mac") !== -1) { os = "iOS"; isMobile = true; }
+
+      // Browser detection
+      if (ua.indexOf("Firefox") !== -1) browser = "Firefox";
+      else if (ua.indexOf("OPR") !== -1 || ua.indexOf("Opera") !== -1) browser = "Opera";
+      else if (ua.indexOf("Trident") !== -1) browser = "Internet Explorer";
+      else if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg/") !== -1) browser = "Edge";
+      else if (ua.indexOf("Chrome") !== -1) browser = "Chrome";
+      else if (ua.indexOf("Safari") !== -1) browser = "Safari";
+
+      setDeviceInfo({ os, browser, isMobile });
+    };
+    parseUserAgent();
+  }, []);
 
   return (
     <div className="page-container settings-page">
@@ -124,34 +153,12 @@ const Settings = () => {
             <div className="device-list">
               <div className="device-item active-device">
                 <div className="device-icon">
-                  <Monitor size={24} />
+                  {deviceInfo.isMobile ? <Smartphone size={24} /> : <Monitor size={24} />}
                 </div>
                 <div className="device-info">
-                  <h4>Chrome no Windows</h4>
-                  <span>Atual (Este dispositivo) • São Paulo, BR</span>
+                  <h4>{deviceInfo.browser} no {deviceInfo.os}</h4>
+                  <span>Atual (Este dispositivo) • Identificado Pelo Sistema</span>
                 </div>
-              </div>
-
-              <div className="device-item">
-                <div className="device-icon">
-                  <Smartphone size={24} />
-                </div>
-                <div className="device-info">
-                  <h4>Safari no iPhone 13</h4>
-                  <span>Último acesso: há 3 horas • Rio de Janeiro, BR</span>
-                </div>
-                <button className="btn-disconnect">Desconectar</button>
-              </div>
-
-              <div className="device-item">
-                <div className="device-icon">
-                  <Monitor size={24} />
-                </div>
-                <div className="device-info">
-                  <h4>Edge no Mac</h4>
-                  <span>Último acesso: 12 de Out • Curitiba, BR</span>
-                </div>
-                <button className="btn-disconnect">Desconectar</button>
               </div>
             </div>
           </section>

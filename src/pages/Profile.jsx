@@ -1,17 +1,27 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Camera, Edit2, CheckCircle, Loader2 } from 'lucide-react';
+import { useAppContext } from '../components/AppContext';
+import { supabase } from '../lib/supabase';
 import './Profile.css';
 
 const Profile = () => {
   const fileInputRef = useRef(null);
+  const { user, refreshUser } = useAppContext();
   
-  const [avatar, setAvatar] = useState("https://ui-avatars.com/api/?name=Alex+Rivers&background=353534&color=A3E635&size=128");
+  const [avatar, setAvatar] = useState(user?.avatarBase64 || `https://ui-avatars.com/api/?name=${(user?.name || 'A').replace(' ', '+')}&background=353534&color=A3E635&size=128`);
   const [form, setForm] = useState({
-    name: 'Alex Rivers',
-    email: 'alex.rivers@example.com',
-    phone: '+1 (555) 012-3456',
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: '',
     org: 'Independent Scholar'
   });
+
+  useEffect(() => {
+    if (user) {
+      setForm(prev => ({...prev, name: user.name, email: user.email}));
+      if (user.avatarBase64) setAvatar(user.avatarBase64);
+    }
+  }, [user]);
   
   const [errors, setErrors] = useState({});
   const [isEditing, setIsEditing] = useState(false);
@@ -42,15 +52,17 @@ const Profile = () => {
     setErrors(prev => ({ ...prev, [name]: error }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Validate all
     let hasError = false;
     const newErrors = {};
     Object.keys(form).forEach(key => {
-      const err = validateField(key, form[key]);
-      if (err) {
-        hasError = true;
-        newErrors[key] = err;
+      if (key === 'name' || key === 'email') {
+        const err = validateField(key, form[key]);
+        if (err) {
+          hasError = true;
+          newErrors[key] = err;
+        }
       }
     });
 
@@ -60,24 +72,65 @@ const Profile = () => {
     }
 
     setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update({ full_name: form.name })
+      .eq('id', user.id);
+
+    if (error) {
+      alert('Erro ao salvar no banco: ' + error.message);
+    } else {
+      await refreshUser();
       setIsEditing(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    }, 1200);
+    }
+    
+    setIsSaving(false);
   };
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleAvatarChange = (e) => {
+  const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // In a real app we'd open a cropper here. For now we use object-fit: cover mock.
-      const url = URL.createObjectURL(file);
-      setAvatar(url);
+      setAvatar(URL.createObjectURL(file)); // Pré visualização instantânea
+      
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      // 1. Upload para o Storage (Criar bucket 'avatars' se não existir manualmente ou via SQL)
+      // Nota: O bucket precisa ser público para download direto aqui
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        alert('Erro ao subir imagem: ' + uploadError.message + '. Garanta que o bucket "avatars" existe e é público.');
+        return;
+      }
+
+      // 2. Pegar URL Pública
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // 3. Atualizar Perfil no Banco
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) {
+        alert('Erro ao atualizar link no perfil: ' + updateError.message);
+      } else {
+        setAvatar(publicUrl);
+        await refreshUser();
+      }
     }
   };
 
@@ -194,38 +247,14 @@ const Profile = () => {
           <section className="profile-section progress-section">
             <h3>Meu Progresso</h3>
             
-            <div className="progress-items">
-              <div className="progress-item">
-                <div className="progress-item-left">
-                  <div className="progress-item-info">
-                    <h4>UI/UX Advanced</h4>
-                    <span>65% Concluído</span>
-                  </div>
-                  <div className="status-pill in-progress">
-                    <div className="dot"></div>
-                    Em Andamento
-                  </div>
-                </div>
-                <div className="progress-circle">
-                  <span>65%</span>
-                </div>
+            <div className="progress-items" style={{ alignItems: 'center', textAlign: 'center', padding: '32px 0' }}>
+              <div className="empty-icon-box" style={{ width: 48, height: 48, marginBottom: 16 }}>
+                 <CheckCircle size={24} color="var(--color-text-secondary)" />
               </div>
-
-              <div className="progress-item">
-                <div className="progress-item-left">
-                  <div className="progress-item-info">
-                    <h4>Foundations</h4>
-                    <span>100% Concluído</span>
-                  </div>
-                  <div className="status-pill completed">
-                    <div className="check-icon">✓</div>
-                    Concluído
-                  </div>
-                </div>
-                <div className="progress-circle full">
-                  <span>100%</span>
-                </div>
-              </div>
+              <h4 style={{ fontSize: '16px', marginBottom: '8px' }}>Nenhuma aula iniciada</h4>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', maxWidth: '280px' }}>
+                Seu progresso aparecerá aqui assim que você iniciar o primeiro módulo dos seus cursos.
+              </p>
             </div>
           </section>
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, PlayCircle, CheckCircle } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import './MyCourses.css';
 
 const MyCourses = () => {
@@ -34,69 +34,23 @@ const MyCourses = () => {
 
   return (
     <div className="page-container course-page">
-      <div className="video-section">
-        <div className="video-player-wrapper">
-          <video 
-            ref={videoRef}
-            src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" 
-            controls 
-            className="video-player"
-            onTimeUpdate={handleTimeUpdate}
-            poster="https://images.unsplash.com/photo-1618761714954-0b8cd0026356?auto=format&fit=crop&q=80&w=1280&h=720"
-          ></video>
-        </div>
+      <div className="page-header" style={{ marginBottom: '32px' }}>
+        <h1 style={{ color: 'var(--color-text-main)', fontSize: '32px', marginBottom: '8px' }}>Meus Cursos</h1>
+        <p style={{ color: 'var(--color-text-secondary)', fontSize: '15px' }}>Gerencie seu progresso e acesso aos materiais.</p>
       </div>
 
-      <div className="course-content-container">
-        <div className="lesson-details">
-          <div className="lesson-header">
-            <span className="module-name">FOUNDATIONS MODULE</span>
-            <h1>Lesson 4: Design Systems</h1>
-            <p className="lesson-desc">
-              Learn how to build scalable components, establish token hierarchies, and create a unified language bridging design and engineering in a dark-mode environment.
-            </p>
-          </div>
-
-          <div className="progress-section">
-            <div className="progress-text">
-              <span>You've watched {progress}% of this lesson</span>
-              <span className="status-badge">{progress >= 70 ? 'COMPLETED' : 'IN PROGRESS'}</span>
-            </div>
-            <div className="progress-bar-bg">
-              <div className="progress-bar-fill" style={{ width: progress + '%' }}></div>
-            </div>
-            {unlocked && (
-              <div className="unlock-alert">
-                 <CheckCircle size={16} />
-                 <span>Certificate Unlocked! You can view it in the Certificates tab.</span>
-              </div>
-            )}
-          </div>
-
-          <div className="navigation-actions">
-            <button className="btn-nav prev">
-              <ArrowLeft size={16} />
-              <span>Previous Lesson</span>
-            </button>
-            <button className="btn-nav next">
-              <span>Next Lesson</span>
-              <ArrowRight size={16} />
-            </button>
-          </div>
-        </div>
-
-        <div className="module-sidebar">
-          <h3>Foundations Playlist</h3>
-          <div className="playlist">
-            {playlist.map((item, idx) => (
-              <div key={idx} className={'playlist-item ' + item.status.toLowerCase()}>
-                <div className="playlist-info">
-                  <span className="playlist-title">{item.title}</span>
-                  <span className="playlist-meta">{item.time} • {item.status}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="content-grid-empty" style={{ gridTemplateColumns: '1fr' }}>
+        <div className="empty-state-card glass">
+           <div className="empty-icon-box" style={{ backgroundColor: 'transparent', border: '1px dashed var(--color-border)' }}>
+             <BookOpen size={32} strokeWidth={1.5} color="var(--color-text-secondary)" />
+           </div>
+           <h2>Nenhuma matrícula ativa</h2>
+           <p>Você não possui acesso a nenhum curso no momento. Quando você adquirir ou iniciar um módulo, ele aparecerá aqui com seu respectivo progresso.</p>
+           <div className="empty-actions">
+              <button className="btn-empty-primary" onClick={() => window.location.href='/workshops'}>
+                Assistir Workshops
+              </button>
+           </div>
         </div>
       </div>
     </div>
