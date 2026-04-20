@@ -1,38 +1,26 @@
 import React from 'react';
 import { Download, Share2 } from 'lucide-react';
-import { useAppContext } from '../components/AppContext';
 import './Certificates.css';
 
 const Certificates = () => {
-  const { user } = useAppContext();
-  
-  const handleLinkedInShare = () => {
-    const shareText = encodeURIComponent(`Muito feliz em compartilhar que acabei de concluir o curso na Lumen Academy! 🚀 #aprendizado #tecnologia`);
-    window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${shareText}`, '_blank');
-  };
-
-  const handleDownloadDemo = () => {
-    alert("Função pronta para emissão baseada em imagem. Envie o certificado base pelo chat para eu anexar a elevação de desenho (Canvas) por cima da imagem!");
-  };
-
   return (
     <div className="page-container certificates-page">
       <div className="ambient-glow"></div>
       
       <div className="cert-content-wrapper">
         <div className="cert-header">
-          <h1>Conquista Desbloqueada</h1>
-          <p>Você dominou o currículo com sucesso.</p>
+          <h1>Achievement Unlocked</h1>
+          <p>You have successfully mastered the curriculum.</p>
         </div>
 
         <div className="action-area">
-          <button className="btn-action primary" onClick={handleDownloadDemo}>
+          <button className="btn-action primary">
             <Download size={18} />
-            <span>Baixar Certificado (PDF)</span>
+            <span>Download Certificate (PDF)</span>
           </button>
-          <button className="btn-action secondary" onClick={handleLinkedInShare}>
+          <button className="btn-action secondary">
             <Share2 size={18} />
-            <span>Compartilhar no LinkedIn</span>
+            <span>Share on LinkedIn</span>
           </button>
         </div>
 
@@ -41,21 +29,21 @@ const Certificates = () => {
           <div className="inner-content">
             <div className="cert-header-sec">
               <div className="badge-glow"></div>
-              <h2>CERTIFICADO DE CONCLUSÃO</h2>
+              <h2>CERTIFICATE OF COMPLETION</h2>
             </div>
             
             <div className="cert-body">
-              <span className="cert-label">Certificamos com louvor que</span>
-              <h3 className="cert-name font-serif">{user.name}</h3>
+              <span className="cert-label">This is to certify that</span>
+              <h3 className="cert-name font-serif">Alex Rivers</h3>
               <div className="divider"></div>
-              <span className="cert-label">concluiu com êxito o programa completo de</span>
+              <span className="cert-label">has successfully completed the comprehensive</span>
               <h4 className="cert-course">UI/UX Masterclass</h4>
             </div>
 
             <div className="cert-footer">
               <div className="cert-meta">
-                <span className="meta-label">DATA DE EMISSÃO</span>
-                <span className="meta-value">20 de Abril, 2026</span>
+                <span className="meta-label">DATE ISSUED</span>
+                <span className="meta-value">October 24, 2023</span>
               </div>
               
               <div className="cert-logo">
@@ -64,7 +52,7 @@ const Certificates = () => {
               </div>
 
               <div className="cert-meta right">
-                <span className="meta-label">ID DA CREDENCIAL</span>
+                <span className="meta-label">CREDENTIAL ID</span>
                 <span className="meta-id">LMN-892-UX</span>
               </div>
             </div>
@@ -76,8 +64,8 @@ const Certificates = () => {
               <span className="percent-text">100%</span>
            </div>
            <div className="bento-info">
-             <h5>Curso Concluído</h5>
-             <p>Você completou 100% dos materiais do curso, incluindo todos os questionários e projetos práticos.</p>
+             <h5>Course Complete</h5>
+             <p>You completed 100% of the course materials, including all quizzes and projects.</p>
            </div>
         </div>
       </div>

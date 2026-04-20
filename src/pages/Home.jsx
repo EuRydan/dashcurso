@@ -1,49 +1,84 @@
 import React from 'react';
 import { PlayCircle, Lock, Play } from 'lucide-react';
-import { useAppContext } from '../components/AppContext';
 import './Home.css';
 
 const Home = () => {
-  const { user } = useAppContext();
-  const firstName = user.name ? user.name.split(' ')[0] : 'Estudante';
-  
   return (
     <div className="page-container home-page">
       <header className="page-header">
-        <h1>Continue assistindo, {firstName}</h1>
+        <h1>Continue watching, Alex</h1>
       </header>
 
-      <div className="content-grid-empty">
-        <div className="empty-state-card glass">
-           <div className="empty-icon-box">
-             <PlayCircle size={32} strokeWidth={1.5} />
-           </div>
-           <h2>Seu aprendizado começa aqui</h2>
-           <p>Você ainda não iniciou nenhuma jornada. Explore a biblioteca de aulas ao vivo e módulos fundamentais para dar o primeiro passo.</p>
-           <div className="empty-actions">
-              <button className="btn-empty-primary" onClick={() => window.location.href='/courses'}>
-                Explorar Módulos
+      <div className="content-grid">
+        <div className="continue-watching-section">
+          {/* Card 1 */}
+          <div className="course-card">
+            <div className="course-card-top">
+              <div className="course-thumb mock-uiux"></div>
+              <div className="course-info">
+                <h3>UI/UX Advanced</h3>
+                <span className="course-module">Module 4: Component Architecture</span>
+                <span className="course-progress">65% Complete</span>
+              </div>
+            </div>
+            <div className="course-card-bottom">
+              <button className="btn-watch">
+                <PlayCircle size={18} />
+                <span>Watch</span>
               </button>
-              <button className="btn-empty-secondary" onClick={() => window.location.href='/workshops'}>
-                Ver Gravações
+            </div>
+          </div>
+
+          {/* Card 2 */}
+          <div className="course-card">
+            <div className="course-card-top">
+              <div className="course-thumb mock-motion"></div>
+              <div className="course-info">
+                <h3>Motion Design</h3>
+                <span className="course-module">Module 1: Easing Basics</span>
+                <span className="course-progress">20% Complete</span>
+              </div>
+            </div>
+            <div className="course-card-bottom">
+              <button className="btn-watch">
+                <PlayCircle size={18} />
+                <span>Watch</span>
               </button>
-           </div>
+            </div>
+          </div>
         </div>
 
         <div className="modules-section">
-          <h2>Seus Módulos</h2>
+          <h2>All Modules</h2>
           <div className="modules-list">
-            <div className="module-item locked empty-module">
+            
+            <div className="module-item unlocked">
+              <div className="module-item-left">
+                <div className="module-icon unlocked">
+                   <Play size={18} fill="currentColor" />
+                </div>
+                <div className="module-info">
+                  <h4>Foundations</h4>
+                  <span>5 lessons</span>
+                </div>
+              </div>
+              <button className="btn-icon">
+                <PlayCircle size={24} />
+              </button>
+            </div>
+
+            <div className="module-item locked">
               <div className="module-item-left">
                 <div className="module-icon locked">
                   <Lock size={18} />
                 </div>
                 <div className="module-info">
-                  <h4>Desbloqueie o acesso</h4>
-                  <span>Faça o upgrade ou matricule-se iniciar.</span>
+                  <h4>Advanced Patterns</h4>
+                  <span>8 lessons</span>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>

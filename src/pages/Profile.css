@@ -129,51 +129,6 @@
   font-weight: 500;
 }
 
-.profile-input {
-  background-color: var(--color-bg-dark);
-  border: 1px solid var(--color-border);
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: var(--color-text-main);
-  font-family: inherit;
-  font-size: 14px;
-  width: 100%;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.profile-input:focus {
-  border-color: var(--color-primary);
-}
-
-.profile-input.error {
-  border-color: #ef4444;
-}
-
-.input-error {
-  color: #ef4444;
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-.profile-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 16px;
-  border-top: 1px solid var(--color-border);
-  padding-top: 24px;
-}
-
-.spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 /* Progress */
 .progress-items {
   display: flex;
