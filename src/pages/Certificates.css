@@ -1,0 +1,257 @@
+.certificates-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 24px;
+  position: relative;
+}
+
+.ambient-glow {
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  background-color: rgba(163, 230, 53, 0.05);
+  filter: blur(120px);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.cert-content-wrapper {
+  max-width: 896px;
+  width: 100%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cert-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.cert-header h1 {
+  font-size: 48px;
+  margin-bottom: 8px;
+  letter-spacing: -1.2px;
+}
+
+.cert-header p {
+  font-size: 18px;
+  color: var(--color-text-secondary);
+}
+
+.action-area {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.btn-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.btn-action.primary {
+  background-color: var(--color-primary);
+  color: #213600;
+}
+.btn-action.primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn-action.secondary {
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-main);
+  font-weight: 500;
+}
+.btn-action.secondary:hover {
+  background-color: var(--color-bg-active);
+}
+
+/* Certificate Card */
+.certificate-card {
+  background-color: var(--color-bg-dark);
+  box-shadow: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  padding: 4px;
+  width: 100%;
+  position: relative;
+  margin-bottom: 48px;
+}
+
+.ghost-border {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.inner-content {
+  background-color: #131313;
+  border-radius: 8px;
+  padding: 64px 64px 32px 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cert-header-sec {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.badge-glow {
+  width: 80px;
+  height: 80px;
+  background-color: var(--color-bg-subtle);
+  border-radius: 50%;
+  box-shadow: inset 0px 2px 4px rgba(0,0,0,0.05);
+}
+
+.cert-header-sec h2 {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.2em;
+  font-weight: 600;
+}
+
+.cert-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.cert-label {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.cert-name {
+  font-size: 60px;
+  color: var(--color-text-main);
+}
+
+.divider {
+  width: 96px;
+  height: 1px;
+  background-color: rgba(163,230,53,0.3);
+}
+
+.cert-course {
+  font-size: 30px;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.cert-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  border-top: 1px solid rgba(42, 42, 42, 0.3);
+  padding-top: 32px;
+  margin-top: 16px;
+}
+
+.cert-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cert-meta.right {
+  align-items: flex-end;
+}
+
+.meta-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.meta-value {
+  font-size: 14px;
+  color: var(--color-text-main);
+}
+
+.meta-id {
+  font-family: monospace;
+  font-size: 14px;
+  color: var(--color-text-main);
+}
+
+.cert-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.8;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: var(--color-text-main);
+}
+
+.logo-sub {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--color-text-secondary);
+}
+
+.progress-summary-bento {
+  background-color: var(--color-bg-card);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 576px;
+}
+
+.bento-icon {
+  width: 64px;
+  height: 64px;
+  background-color: var(--color-bg-subtle);
+  border-radius: 50%;
+  border: 1px solid rgba(163,230,53,0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.percent-text {
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.bento-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bento-info h5 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.bento-info p {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
