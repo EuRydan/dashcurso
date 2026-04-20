@@ -84,6 +84,14 @@
   margin-top: 48px;
 }
 
+@media (max-width: 1024px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    margin-top: 32px;
+  }
+}
+
 .profile-section {
   background-color: var(--color-bg-card);
   border-radius: 12px;
@@ -92,7 +100,12 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+  .profile-section {
+    padding: 24px;
+  }
 }
 
 .section-header {

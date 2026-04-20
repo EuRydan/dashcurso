@@ -105,6 +105,13 @@
   overflow: hidden;
 }
 
+@media (max-width: 768px) {
+  .inner-content {
+    padding: 32px 24px 24px 24px;
+    gap: 32px;
+  }
+}
+
 .cert-header-sec {
   display: flex;
   flex-direction: column;
@@ -143,6 +150,13 @@
 .cert-name {
   font-size: 60px;
   color: var(--color-text-main);
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .cert-name {
+    font-size: 32px;
+  }
 }
 
 .divider {
@@ -155,6 +169,13 @@
   font-size: 30px;
   color: var(--color-primary);
   font-weight: 600;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .cert-course {
+    font-size: 20px;
+  }
 }
 
 .cert-footer {
@@ -165,6 +186,17 @@
   border-top: 1px solid rgba(42, 42, 42, 0.3);
   padding-top: 32px;
   margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .cert-footer {
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+  }
+  .cert-meta.right {
+    align-items: center;
+  }
 }
 
 .cert-meta {
