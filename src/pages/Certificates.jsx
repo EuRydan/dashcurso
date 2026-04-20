@@ -5,19 +5,6 @@ import './Certificates.css';
 
 const Certificates = () => {
   const { user } = useAppContext();
-  
-  // Lista de certificados vazia por padrão
-  const [certificates, setCertificates] = useState([]);
-
-  const handleLinkedInShare = (certName) => {
-    const text = encodeURIComponent(`Acabei de conquistar meu certificado em ${certName} na Lumen Academy! 🚀 Muito feliz com essa nova etapa na minha jornada de aprendizado.`);
-    const url = `https://www.linkedin.com/feed/?shareActive=true&text=${text}`;
-    window.open(url, '_blank');
-  };
-
-  return (
-const Certificates = () => {
-  const { user } = useAppContext();
   const userName = user?.name || 'Alex Rivers';
 
   return (
