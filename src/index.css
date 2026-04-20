@@ -276,7 +276,12 @@ a {
   z-index: 1000;
 }
 
-.spin {
+.spinner-loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-bg-subtle);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 

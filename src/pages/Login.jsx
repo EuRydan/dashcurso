@@ -146,7 +146,7 @@ const Login = () => {
                 />
                 {error && <div className="auth-error"><AlertCircle size={14}/> {error}</div>}
                 <button type="submit" className="btn-main" disabled={loading || magicCodeInput.length < 6}>
-                  {loading ? <Loader2 className="spin" size={18}/> : 'Entrar na Plataforma'}
+                  {loading ? <div className="spinner-small"></div> : 'Entrar na Plataforma'}
                 </button>
                 <button type="button" className="btn-text" onClick={() => setIsMagicFlow(false)}>Voltar</button>
               </form>
@@ -165,7 +165,7 @@ const Login = () => {
                 </div>
                 {error && <div className="auth-error"><AlertCircle size={14}/> {error}</div>}
                 <button type="submit" className="btn-main" disabled={loading}>
-                  {loading ? <Loader2 className="spin" size={18}/> : 'Acessar'}
+                  {loading ? <div className="spinner-small"></div> : 'Acessar'}
                 </button>
                 <button type="button" className="btn-ghost" onClick={handleMagicLinkRequest} disabled={loading}>
                   <Wand2 size={16}/> Link Mágico por E-mail
