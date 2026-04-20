@@ -1,3 +1,4 @@
+// Build trigger: 2026-04-20T20:04
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AlertCircle, Loader2 } from 'lucide-react';
