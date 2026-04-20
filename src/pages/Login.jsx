@@ -4,7 +4,7 @@ import { AlertCircle, Wand2, ShieldCheck, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './Login.css';
 
-// Ícone Google
+// Ícone Google Premium
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="currentColor"/>
@@ -18,30 +18,21 @@ const Login = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   
-  // Login States
+  // States
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  // Register States
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
-  
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Magic Link Flow States
   const [isMagicFlow, setIsMagicFlow] = useState(false);
-  const [magicCodeTarget, setMagicCodeTarget] = useState('');
   const [magicCodeInput, setMagicCodeInput] = useState('');
 
-  // Ao iniciar a tela, checar se já está logado
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/');
-      }
+      if (session) navigate('/');
     };
     checkUser();
   }, [navigate]);
@@ -54,100 +45,44 @@ const Login = () => {
 
   const handleValidationSubmit = async (e, isLoginForm) => {
     e.preventDefault();
-    if (isMagicFlow) return;
-
     setError('');
     setLoading(true);
 
     if (isLoginForm) {
-      if (!email || !password) {
-        setError('Preencha os dados obrigatórios ou use o Link Mágico.');
-        setLoading(false);
-        return;
-      }
-      
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        setError('Email ou senha inválidos. Tente novamente.');
-        setLoading(false);
-      } else {
-        navigate('/');
-      }
-
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) { setError('Acesso negado. Verifique suas credenciais.'); setLoading(false); }
+      else navigate('/');
     } else {
-      if (!regName || !regEmail || !regPassword) {
-        setError('Preencha todos os campos para prosseguir.');
-        setLoading(false);
-        return;
-      }
-
       const { error } = await supabase.auth.signUp({
         email: regEmail,
         password: regPassword,
-        options: {
-          data: {
-            full_name: regName,
-          }
-        }
+        options: { data: { full_name: regName } }
       });
-
-      if (error) {
-        setError(error.message || 'Erro ao realizar cadastro.');
-        setLoading(false);
-      } else {
-        // Redireciona ou avisa do email de confirmação
-        navigate('/');
-      }
+      if (error) { setError(error.message); setLoading(false); }
+      else navigate('/');
     }
   };
 
-  // --- LOGIN: Magic Link Flow ---
   const handleMagicLinkRequest = async () => {
     setError('');
-    if (!email) {
-      setError('Insira o seu e-mail acima para receber o Link Mágico.');
-      return;
-    }
-    
+    if (!email) { setError('Insira seu e-mail para receber o link.'); return; }
     setLoading(true);
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: {
-        shouldCreateUser: false, // Só permite Magic Link para quem já tem conta
-        emailRedirectTo: window.location.origin,
-      }
+      options: { shouldCreateUser: false, emailRedirectTo: window.location.origin }
     });
-
     setLoading(false);
-    if (error) {
-      setError(error.message || 'Erro ao enviar Link Mágico.');
-    } else {
-      setIsMagicFlow(true);
-      alert('Link Mágico e Código enviados para seu e-mail!');
-    }
+    if (error) setError(error.message);
+    else setIsMagicFlow(true);
   };
 
   const handleMagicCodeValidate = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token: magicCodeInput,
-      type: 'magiclink'
-    });
-
-    if (error) {
-       setError('Código inválido ou expirado. Tente novamente.');
-       setLoading(false);
-    } else {
-       navigate('/');
-    }
+    const { error } = await supabase.auth.verifyOtp({ email, token: magicCodeInput, type: 'magiclink' });
+    if (error) { setError('Código expirado ou inválido.'); setLoading(false); }
+    else navigate('/');
   };
 
   const handleGoogleLogin = async (e) => {
@@ -155,242 +90,125 @@ const Login = () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: window.location.origin
-      }
+      options: { redirectTo: window.location.origin }
     });
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    }
-  };
-
-  const cancelMagicFlow = () => {
-    setIsMagicFlow(false);
-    setMagicCodeInput('');
-    setError('');
+    if (error) { setError(error.message); setLoading(false); }
   };
 
   return (
-    <div className={`auth-wrapper ${isLogin ? 'is-login' : 'is-register'}`}>
-      {/* Decorative background elements */}
-      <div className="bg-glow-1"></div>
-      <div className="bg-glow-2"></div>
-      <div className="bg-grid"></div>
-      
-      {/* Imagem do Painel sempre estática, nós movemos pelo CSS */}
-      <div className="auth-panel image-panel">
-        <div className="image-overlay">
-           <div className="image-content">
-              <h2>Lumen</h2>
-              <p>O design minimalista que conecta você ao futuro com movimentos orgânicos e precisos.</p>
-           </div>
-        </div>
+    <div className="auth-master-container">
+      {/* Aurora Background Effects */}
+      <div className="aurora-bg">
+        <div className="aurora-element aurora-1"></div>
+        <div className="aurora-element aurora-2"></div>
+        <div className="aurora-element aurora-3"></div>
       </div>
-      
-      {/* Container dos Formulários */}
-      <div className="auth-panel form-panel">
-        
-        {/* ======== LOGIN ======== */}
-        <div className={`form-container ${isLogin ? 'active' : 'inactive'}`}>
-          <div className="form-header">
-            {isMagicFlow ? (
+
+      <div className={`auth-card-wrapper ${isLogin ? 'is-login' : 'is-register'}`}>
+        <div className="auth-card">
+          
+          {/* LOGIN SECTION */}
+          <div className={`auth-inner-section ${isLogin ? 'active' : 'inactive'}`}>
+            <div className="auth-header">
+              {isMagicFlow ? (
+                <>
+                  <h1>Validar Acesso<span className="dot">.</span></h1>
+                  <p>Insira o código enviado para <b>{email}</b></p>
+                </>
+              ) : (
+                <>
+                  <h1>Bem-vindo<span className="dot">.</span></h1>
+                  <p>Acesse sua plataforma Lumen.</p>
+                </>
+              )}
+            </div>
+
+            {!isMagicFlow && (
               <>
-                <h1>Validar Acesso<span className="dot">.</span></h1>
-                <p className="sub_desc">Insira o código de <b>6 dígitos</b> enviado para <b>{email}</b></p>
-              </>
-            ) : (
-              <>
-                <h1>Bem-vindo de volta<span className="dot">.</span></h1>
-                <p className="sub_desc">Acesse sua plataforma agora.</p>
+                <button className="btn-google" onClick={handleGoogleLogin} disabled={loading}>
+                  <GoogleIcon /> Continuar com Google
+                </button>
+                <div className="auth-divider"><span>ou use sua conta</span></div>
               </>
             )}
-          </div>
-          
-          {!isMagicFlow && (
-            <>
-              <div className="social-auth">
-                {/* Agora só com Google, usando width 100% ou flex 1 conforme CSS */}
-                <button className="btn-social google-btn" onClick={handleGoogleLogin} disabled={loading}>
-                  <GoogleIcon />
-                  Continuar com Google
-                </button>
-              </div>
 
-              <div className="divider">
-                <span>Ou entre com email</span>
-              </div>
-            </>
-          )}
-
-          {/* Form normal de login ou form de validação de link mágico */}
-          {isMagicFlow ? (
-            <form onSubmit={handleMagicCodeValidate} className="auth-form magic-flow-form">
-               <div className="input-group">
-                <label>Código de Verificação</label>
-                <div className="input-wrapper">
-                  <input 
-                    type="text" 
-                    placeholder="000000"
-                    maxLength={6}
-                    value={magicCodeInput}
-                    onChange={(e) => setMagicCodeInput(e.target.value.replace(/\D/g, ''))}
-                    disabled={loading}
-                    autoFocus
-                    style={{ letterSpacing: '4px', fontSize: '20px', textAlign: 'center' }}
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <div className="error-message">
-                  <AlertCircle size={14} />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <button type="submit" className="btn-primary" disabled={loading || magicCodeInput.length < 6}>
-                {loading ? 'Verificando...' : 'Acessar Plataforma'}
-              </button>
-
-              <button type="button" className="switch-mode-btn" onClick={cancelMagicFlow} disabled={loading}>
-                Voltar ao login comum
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={(e) => handleValidationSubmit(e, true)} className="auth-form">
-              <div className="input-group">
-                <label>Email Corporativo</label>
-                <div className="input-wrapper">
-                  <input 
-                    type="email" 
-                    placeholder="Seu melhor email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                  />
-                </div>
-              </div>
-
-              <div className="input-group">
-                <label>Senha</label>
-                <div className="input-wrapper">
-                  <input 
-                    type="password" 
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                  />
-                </div>
-                <div className="forgot-password">
-                  <a href="#recuperar">Esqueci minha senha</a>
-                </div>
-              </div>
-
-              {error && (
-                <div className="error-message">
-                  <AlertCircle size={14} />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <button type="submit" className="btn-primary" disabled={loading}>
-                {loading ? 'Acessando...' : 'Fazer Login'}
-              </button>
-
-              <button type="button" className="btn-secondary" onClick={handleMagicLinkRequest} disabled={loading}>
-                <Wand2 size={16} /> Entrar usando Link Mágico
-              </button>
-              
-              <div className="switch-mode">
-                <span>É novo por aqui?</span>
-                <button type="button" onClick={toggleMode} disabled={loading}>
-                  Crie sua conta agora
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-
-        {/* ======== CADASTRO ======== */}
-        <div className={`form-container ${!isLogin ? 'active' : 'inactive'}`}>
-          <div className="form-header">
-            <h1>Crie sua Conta<span className="dot">.</span></h1>
-            <p className="sub_desc">Dê o próximo passo na sua jornada.</p>
-          </div>
-          
-          <div className="social-auth">
-            <button className="btn-social google-btn" onClick={handleGoogleLogin} disabled={loading}>
-              <GoogleIcon />
-              Continuar com Google
-            </button>
-          </div>
-
-          <div className="divider">
-            <span>Ou insira os seus dados</span>
-          </div>
-          
-          <form onSubmit={(e) => handleValidationSubmit(e, false)} className="auth-form">
-            <div className="input-group">
-              <label>Nome Completo</label>
-              <div className="input-wrapper">
+            {isMagicFlow ? (
+              <form onSubmit={handleMagicCodeValidate} className="auth-form-body">
                 <input 
                   type="text" 
-                  placeholder="Ex: João da Silva"
-                  value={regName}
-                  onChange={(e) => setRegName(e.target.value)}
+                  className="magic-code-input"
+                  placeholder="000000" 
+                  maxLength={6}
+                  value={magicCodeInput}
+                  onChange={(e) => setMagicCodeInput(e.target.value.replace(/\D/g, ''))}
                   disabled={loading}
+                  autoFocus
                 />
-              </div>
-            </div>
-
-            <div className="input-group">
-              <label>Melhor Email</label>
-              <div className="input-wrapper">
-                <input 
-                  type="email" 
-                  placeholder="joao@exemplo.com"
-                  value={regEmail}
-                  onChange={(e) => setRegEmail(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            <div className="input-group">
-              <label>Criar Senha</label>
-              <div className="input-wrapper">
-                <input 
-                  type="password" 
-                  placeholder="Crie uma senha forte"
-                  value={regPassword}
-                  onChange={(e) => setRegPassword(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            {error && !isLogin && (
-              <div className="error-message">
-                <AlertCircle size={14} />
-                <span>{error}</span>
-              </div>
+                {error && <div className="auth-error"><AlertCircle size={14}/> {error}</div>}
+                <button type="submit" className="btn-main" disabled={loading || magicCodeInput.length < 6}>
+                  {loading ? <Loader2 className="spin" size={18}/> : 'Entrar na Plataforma'}
+                </button>
+                <button type="button" className="btn-text" onClick={() => setIsMagicFlow(false)}>Voltar</button>
+              </form>
+            ) : (
+              <form onSubmit={(e) => handleValidationSubmit(e, true)} className="auth-form-body">
+                <div className="auth-input-group">
+                  <label>E-mail</label>
+                  <input type="email" placeholder="nome@exemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading}/>
+                </div>
+                <div className="auth-input-group">
+                  <div className="label-row">
+                    <label>Senha</label>
+                    <a href="#recuperar" className="link-small">Esqueci a senha</a>
+                  </div>
+                  <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading}/>
+                </div>
+                {error && <div className="auth-error"><AlertCircle size={14}/> {error}</div>}
+                <button type="submit" className="btn-main" disabled={loading}>
+                  {loading ? <Loader2 className="spin" size={18}/> : 'Acessar'}
+                </button>
+                <button type="button" className="btn-ghost" onClick={handleMagicLinkRequest} disabled={loading}>
+                  <Wand2 size={16}/> Link Mágico por E-mail
+                </button>
+                <div className="auth-footer">
+                  Novo por aqui? <button type="button" onClick={toggleMode}>Crie sua conta</button>
+                </div>
+              </form>
             )}
+          </div>
 
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'Processando dados...' : 'Criar minha conta'}
-            </button>
-            
-            <div className="switch-mode">
-              <span>Já possui uma conta?</span>
-              <button type="button" onClick={toggleMode} disabled={loading}>
-                Faça login para continuar
-              </button>
+          {/* REGISTER SECTION */}
+          <div className={`auth-inner-section ${!isLogin ? 'active' : 'inactive'}`}>
+            <div className="auth-header">
+              <h1>Criar Conta<span className="dot">.</span></h1>
+              <p>Comece sua jornada agora mesmo.</p>
             </div>
-          </form>
-        </div>
+            <button className="btn-google" onClick={handleGoogleLogin} disabled={loading}>
+              <GoogleIcon /> Continuar com Google
+            </button>
+            <div className="auth-divider"><span>ou preencha os dados</span></div>
+            <form onSubmit={(e) => handleValidationSubmit(e, false)} className="auth-form-body">
+              <div className="auth-input-group">
+                <label>Nome Completo</label>
+                <input type="text" placeholder="Seu nome" value={regName} onChange={(e) => setRegName(e.target.value)} disabled={loading}/>
+              </div>
+              <div className="auth-input-group">
+                <label>E-mail</label>
+                <input type="email" placeholder="nome@exemplo.com" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} disabled={loading}/>
+              </div>
+              <div className="auth-input-group">
+                <label>Defina uma Senha</label>
+                <input type="password" placeholder="Crie uma senha forte" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} disabled={loading}/>
+              </div>
+              {error && !isLogin && <div className="auth-error"><AlertCircle size={14}/> {error}</div>}
+              <button type="submit" className="btn-main" disabled={loading}>Criar minha conta</button>
+              <div className="auth-footer">
+                Já tem conta? <button type="button" onClick={toggleMode}>Fazer login</button>
+              </div>
+            </form>
+          </div>
 
+        </div>
       </div>
     </div>
   );
