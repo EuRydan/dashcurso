@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Edit2, Shield, Lock, ExternalLink, Save, X, Loader2, LogOut, Milestone, Award, Clock } from 'lucide-react';
+import { Camera, Edit2, Shield, Lock, ExternalLink, Save, X, Loader2, LogOut, Milestone, Award, Clock, Mail, Phone, Globe, CheckCircle2 } from 'lucide-react';
 import { useAppContext } from '../components/AppContext';
 import { supabase } from '../lib/supabase';
 import './Profile.css';
@@ -9,22 +9,32 @@ const Profile = () => {
   const fileInputRef = useRef(null);
   
   const [isEditing, setIsEditing] = useState(false);
-  const [newName, setNewName] = useState(user?.name || '');
+  const [newNickname, setNewNickname] = useState(user?.nickname || '');
+  const [newFullName, setNewFullName] = useState(user?.full_name || '');
   const [newStatus, setNewStatus] = useState(user?.status || 'Estudante');
   const [newCountry, setNewCountry] = useState(user?.country || 'Brasil');
+  const [newPhone, setNewPhone] = useState(user?.phone || '');
+  
   const [isSaving, setIsSaving] = useState(false);
 
+  // Email Change State
+  const [emailModalStep, setEmailModalStep] = useState(0); // 0: closed, 1: input email, 2: input code
+  const [tempEmail, setTempEmail] = useState('');
+  const [otpToken, setOtpToken] = useState('');
+  const [emailError, setEmailError] = useState('');
+
   const handleUpdateProfile = async () => {
-    if (!newName.trim()) return;
     setIsSaving(true);
     try {
       const { error } = await supabase
         .from('profiles')
         .upsert({ 
           id: user.id, 
-          full_name: newName,
+          nickname: newNickname,
+          full_name: newFullName,
           status: newStatus,
           country: newCountry,
+          phone: newPhone,
           updated_at: new Date()
         });
 
@@ -74,7 +84,7 @@ const Profile = () => {
       await refreshUser();
     } catch (err) {
       console.error('Error updating avatar:', err);
-      alert('Erro ao atualizar foto. Tente novamente com uma imagem menor.');
+      alert('Erro ao atualizar foto.');
     } finally {
       setIsSaving(false);
     }
@@ -85,12 +95,110 @@ const Profile = () => {
     window.location.href = '/login';
   };
 
+  // Email Change Flow
+  const startEmailChange = async () => {
+    if (!tempEmail || tempEmail === user.email) {
+      setEmailError('Insira um novo endereço de e-mail válido.');
+      return;
+    }
+    setIsSaving(true);
+    setEmailError('');
+    try {
+      const { error } = await supabase.auth.updateUser({ email: tempEmail });
+      if (error) throw error;
+      setEmailModalStep(2);
+    } catch (err) {
+      setEmailError(err.message || 'Erro ao iniciar troca de e-mail.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const verifyEmailCode = async () => {
+    if (otpToken.length !== 6) {
+      setEmailError('O código deve ter 6 dígitos.');
+      return;
+    }
+    setIsSaving(true);
+    setEmailError('');
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: tempEmail,
+        token: otpToken,
+        type: 'email_change'
+      });
+      if (error) throw error;
+      
+      await refreshUser();
+      setEmailModalStep(0);
+      setTempEmail('');
+      setOtpToken('');
+      alert('E-mail atualizado com sucesso!');
+    } catch (err) {
+      setEmailError('Código inválido ou expirado.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="profile-page">
+      {/* MODAL DE EMAIL */}
+      {emailModalStep > 0 && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-card">
+            <header className="modal-header">
+              <h3>Alterar E-mail</h3>
+              <button className="btn-close" onClick={() => setEmailModalStep(0)}><X size={20} /></button>
+            </header>
+            
+            <div className="modal-body">
+              {emailModalStep === 1 ? (
+                <>
+                  <p className="modal-desc">Insira seu novo endereço de e-mail. Enviaremos um código de 6 dígitos para confirmação.</p>
+                  <div className="input-group-modern">
+                    <Mail size={18} className="input-icon" />
+                    <input 
+                      type="email" 
+                      placeholder="Novo e-mail" 
+                      value={tempEmail}
+                      onChange={(e) => setTempEmail(e.target.value)}
+                    />
+                  </div>
+                  {emailError && <span className="error-text">{emailError}</span>}
+                  <button className="btn-primary w-full mt-4" onClick={startEmailChange} disabled={isSaving}>
+                    {isSaving ? <Loader2 className="spin" size={20} /> : 'Enviar Código'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="modal-desc">Enviamos um código para <strong>{tempEmail}</strong>. Insira-o abaixo para confirmar:</p>
+                  <div className="otp-container">
+                    <input 
+                      type="text" 
+                      maxLength="6" 
+                      placeholder="000000" 
+                      className="otp-input"
+                      value={otpToken}
+                      onChange={(e) => setOtpToken(e.target.value.replace(/\D/g, ''))}
+                    />
+                  </div>
+                  {emailError && <span className="error-text">{emailError}</span>}
+                  <button className="btn-primary w-full mt-4" onClick={verifyEmailCode} disabled={isSaving}>
+                    {isSaving ? <Loader2 className="spin" size={20} /> : 'Verificar e Salvar'}
+                  </button>
+                  <button className="btn-ghost w-full mt-2" onClick={() => setEmailModalStep(1)}>Voltar</button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="profile-hero-modern">
         <div className="hero-content">
           <div className="avatar-big-wrapper" onClick={handleAvatarClick}>
-            <img src={user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.name?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`} alt="Profile" />
+            <img src={user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.nickname?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`} alt="Profile" />
             <div className="btn-edit-photo-minimal">
               <Camera size={18} />
             </div>
@@ -108,10 +216,10 @@ const Profile = () => {
                 <div className="edit-name-row">
                   <input 
                     type="text" 
-                    value={newName} 
-                    onChange={(e) => setNewName(e.target.value)}
+                    value={newNickname} 
+                    onChange={(e) => setNewNickname(e.target.value)}
                     className="modern-edit-input"
-                    placeholder="Nome"
+                    placeholder="Apelido"
                     autoFocus
                   />
                   <div className="edit-actions">
@@ -134,7 +242,7 @@ const Profile = () => {
             ) : (
               <>
                 <div className="display-name-group" onClick={() => setIsEditing(true)}>
-                  <h1>{user?.name || 'Alex Rivers'}</h1>
+                  <h1>{user?.nickname || 'Usuário'}</h1>
                   <div className="edit-trigger visible">
                     <Edit2 size={18} />
                   </div>
@@ -167,19 +275,40 @@ const Profile = () => {
               <div className="info-block">
                 <label>Nome Completo</label>
                 {isEditing ? (
-                  <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} className="info-edit-input" />
+                  <input type="text" value={newFullName} onChange={(e) => setNewFullName(e.target.value)} className="info-edit-input" placeholder="Seu nome real" />
                 ) : (
-                  <span>{user?.name || 'Não informado'}</span>
+                  <span>{user?.full_name || 'Não informado'}</span>
                 )}
               </div>
+              
               <div className="info-block">
                 <label>Endereço de E-mail</label>
-                <span className="read-only-text">{user?.email}</span>
+                <div className="email-display-row">
+                  <span className="read-only-text">{user?.email}</span>
+                  {isEditing && (
+                    <button className="btn-change-email" onClick={() => setEmailModalStep(1)}>Alterar</button>
+                  )}
+                </div>
               </div>
+
               <div className="info-block">
                 <label>Telefone</label>
-                <span className="read-only-text">+55 (00) 00000-0000</span>
+                {isEditing ? (
+                  <input type="text" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} className="info-edit-input" placeholder="+55 (00) 00000-0000" />
+                ) : (
+                  <span>{user?.phone || '+55 (00) 00000-0000'}</span>
+                )}
               </div>
+
+              <div className="info-block">
+                <label>País / Região</label>
+                {isEditing ? (
+                  <input type="text" value={newCountry} onChange={(e) => setNewCountry(e.target.value)} className="info-edit-input" placeholder="Brasil" />
+                ) : (
+                  <span>{user?.country || 'Brasil'}</span>
+                )}
+              </div>
+
               <div className="info-block">
                 <label>Organização</label>
                 <span className="read-only-text">Estudante Independente</span>
@@ -191,39 +320,9 @@ const Profile = () => {
         <section className="profile-col-right">
           <div className="progress-square glass-card">
             <h3>Meu Progresso</h3>
-            <div className="nested-progress-list">
-              <div className="nested-item">
-                <div className="nested-header">
-                   <span>UI/UX Avançado</span>
-                   <span className="progress-badge">Em Progresso</span>
-                </div>
-                <div className="nested-bar-bg">
-                   <div className="nested-bar-fill" style={{ width: '65%' }} />
-                </div>
-                <span className="nested-label">65% Concluído</span>
-              </div>
-
-              <div className="nested-item">
-                <div className="nested-header">
-                   <span>Motion Design</span>
-                   <span className="progress-badge">Em Progresso</span>
-                </div>
-                <div className="nested-bar-bg">
-                   <div className="nested-bar-fill" style={{ width: '20%' }} />
-                </div>
-                <span className="nested-label">20% Concluído</span>
-              </div>
-
-              <div className="nested-item">
-                <div className="nested-header">
-                   <span>Fundamentos</span>
-                   <span className="progress-badge completed">Concluído</span>
-                </div>
-                <div className="nested-bar-bg">
-                   <div className="nested-bar-fill done" style={{ width: '100%' }} />
-                </div>
-                <span className="nested-label">100% Concluído</span>
-              </div>
+            <div className="empty-state-minimal-v2">
+               <div className="empty-progress-border" />
+               <p className="text-secondary-small">O acompanhamento de progresso das suas trilhas aparecerá aqui assim que você iniciar o primeiro módulo.</p>
             </div>
           </div>
 

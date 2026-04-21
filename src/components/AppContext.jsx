@@ -44,7 +44,8 @@ export const AppProvider = ({ children }) => {
           setUser({
             id: authUser.id,
             email: authUser.email,
-            name: authUser.user_metadata?.full_name || authUser.email.split('@')[0],
+            nickname: authUser.user_metadata?.nickname || authUser.user_metadata?.full_name?.split(' ')[0] || authUser.email.split('@')[0],
+            full_name: authUser.user_metadata?.full_name || '',
             avatarBase64: authUser.user_metadata?.avatar_url || null,
             email_confirmed_at: authUser.email_confirmed_at
           });
@@ -72,7 +73,8 @@ export const AppProvider = ({ children }) => {
           ...prev,
           id: authUser.id,
           email: authUser.email,
-          name: authUser.user_metadata?.full_name || prev?.name || authUser.email.split('@')[0],
+          nickname: authUser.user_metadata?.nickname || authUser.user_metadata?.full_name?.split(' ')[0] || prev?.nickname || authUser.email.split('@')[0],
+          full_name: authUser.user_metadata?.full_name || prev?.full_name || '',
           email_confirmed_at: authUser.email_confirmed_at
         }));
         await fetchUserProfile(authUser);
@@ -102,10 +104,12 @@ export const AppProvider = ({ children }) => {
       setUser({
         id: authUser.id,
         email: authUser.email,
-        name: data?.full_name || authUser.user_metadata?.full_name || authUser.email.split('@')[0],
+        nickname: data?.nickname || authUser.user_metadata?.nickname || authUser.email.split('@')[0],
+        full_name: data?.full_name || authUser.user_metadata?.full_name || '',
         avatarBase64: data?.avatar_url || authUser.user_metadata?.avatar_url || null,
         status: data?.status || 'Estudante',
         country: data?.country || 'Brasil',
+        phone: data?.phone || '',
         email_confirmed_at: authUser.email_confirmed_at
       });
     } catch (err) {
