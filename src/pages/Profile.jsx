@@ -10,9 +10,11 @@ const Profile = () => {
   
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(user?.name || '');
+  const [newStatus, setNewStatus] = useState(user?.status || 'Estudante');
+  const [newCountry, setNewCountry] = useState(user?.country || 'Brasil');
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleUpdateName = async () => {
+  const handleUpdateProfile = async () => {
     if (!newName.trim()) return;
     setIsSaving(true);
     try {
@@ -21,6 +23,8 @@ const Profile = () => {
         .upsert({ 
           id: user.id, 
           full_name: newName,
+          status: newStatus,
+          country: newCountry,
           updated_at: new Date()
         });
 
@@ -28,8 +32,8 @@ const Profile = () => {
       await refreshUser();
       setIsEditing(false);
     } catch (err) {
-      console.error('Error updating name:', err);
-      alert('Erro ao atualizar nome.');
+      console.error('Error updating profile:', err);
+      alert('Erro ao atualizar perfil.');
     } finally {
       setIsSaving(false);
     }
@@ -99,37 +103,46 @@ const Profile = () => {
           </div>
           <div className="hero-text">
             {isEditing ? (
-              <div className="edit-name-container">
+              <div className="edit-profile-container">
+                <div className="edit-name-row">
+                  <input 
+                    type="text" 
+                    value={newName} 
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="modern-edit-input"
+                    placeholder="Nome"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleUpdateProfile();
+                      if (e.key === 'Escape') setIsEditing(false);
+                    }}
+                  />
+                  <div className="edit-actions">
+                    <button className="btn-save-glow" onClick={handleUpdateProfile} disabled={isSaving}>
+                      {isSaving ? <Loader2 className="spin" size={16} /> : <Save size={16} />}
+                    </button>
+                    <button className="btn-close-edit" onClick={() => setIsEditing(false)}>
+                      <X size={16} />
+                    </button>
+                  </div>
+                </div>
                 <input 
                   type="text" 
-                  value={newName} 
-                  onChange={(e) => setNewName(e.target.value)}
-                  className="modern-edit-input"
-                  autoFocus
-                  onBlur={() => !newName.trim() && setIsEditing(false)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleUpdateName();
-                    if (e.key === 'Escape') setIsEditing(false);
-                  }}
+                  value={newStatus} 
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="status-edit-input"
+                  placeholder="Seu status (ex: Estudante)"
                 />
-                <div className="edit-actions">
-                  <button className="btn-save-glow" onClick={handleUpdateName} disabled={isSaving}>
-                    {isSaving ? <Loader2 className="spin" size={16} /> : <Save size={16} />}
-                  </button>
-                  <button className="btn-close-edit" onClick={() => setIsEditing(false)}>
-                    <X size={16} />
-                  </button>
-                </div>
               </div>
             ) : (
               <div className="display-name-group" onClick={() => setIsEditing(true)}>
                 <h1>{user?.name || 'Alex Rivers'}</h1>
-                <div className="edit-trigger">
+                <div className="edit-trigger visible">
                   <Edit2 size={18} />
                 </div>
               </div>
             )}
-            <p className="status-label">Estudante • Desde 2026</p>
+            {!isEditing && <p className="status-label">{user?.status || 'Estudante'} • Desde 2026</p>}
           </div>
         </div>
       </header>
@@ -141,18 +154,32 @@ const Profile = () => {
             <div className="info-grid">
               <div className="info-field">
                 <label>Nome Completo</label>
-                <span>{user?.name || 'Não informado'}</span>
+                {isEditing ? (
+                  <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} className="info-edit-input" />
+                ) : (
+                  <span>{user?.name || 'Não informado'}</span>
+                )}
               </div>
               <div className="info-field">
                 <label>Endereço de E-mail</label>
-                <span>{user?.email}</span>
+                <span className="read-only-email">{user?.email}</span>
               </div>
               <div className="info-field">
                 <label>País / Região</label>
-                <span>Brasil</span>
+                {isEditing ? (
+                  <input type="text" value={newCountry} onChange={(e) => setNewCountry(e.target.value)} className="info-edit-input" />
+                ) : (
+                  <span>{user?.country || 'Brasil'}</span>
+                )}
               </div>
             </div>
-            <button className="btn-secondary" onClick={() => setIsEditing(true)}>Editar Detalhes</button>
+            {!isEditing ? (
+              <button className="btn-secondary" onClick={() => setIsEditing(true)}>Editar Detalhes</button>
+            ) : (
+              <button className="btn-primary-mini" onClick={handleUpdateProfile} disabled={isSaving}>
+                {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+              </button>
+            )}
           </div>
 
           <div className="security-box glass-card">

@@ -104,6 +104,8 @@ export const AppProvider = ({ children }) => {
         email: authUser.email,
         name: data?.full_name || authUser.user_metadata?.full_name || authUser.email.split('@')[0],
         avatarBase64: data?.avatar_url || authUser.user_metadata?.avatar_url || null,
+        status: data?.status || 'Estudante',
+        country: data?.country || 'Brasil',
         email_confirmed_at: authUser.email_confirmed_at
       });
     } catch (err) {
