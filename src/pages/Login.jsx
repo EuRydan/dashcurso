@@ -372,11 +372,11 @@ const Login = () => {
               ) : (
                 <form onSubmit={handleVerifyOtpLogin} className="main-form">
                   <div className="otp-modern-wrapper">
-                    <p className="otp-info-text text-center mb-4">Insira o código de 6 dígitos enviado para <strong>{email}</strong></p>
+                    <p className="otp-info-text text-center mb-4">Insira o código enviado para <strong>{email}</strong></p>
                     <input
                       type="text"
-                      maxLength={6}
-                      placeholder="000000"
+                      maxLength={8}
+                      placeholder="00000000"
                       className="otp-field-big"
                       value={loginOtp}
                       onChange={(e) => setLoginOtp(e.target.value.replace(/\D/g, ''))}
