@@ -41,6 +41,8 @@ const Profile = () => {
   const handleUpdateProfile = async (target) => {
     console.log('[Profile] Iniciando salvamento:', target);
     setIsSaving(true);
+    
+    // Timeout de segurança para o fluxo total não travar a UI
     try {
       const updateData = { 
         id: user.id, 
@@ -54,26 +56,25 @@ const Profile = () => {
 
       console.log('[Profile] Enviando dados via upsert:', updateData);
 
-      const { error } = await supabase
-        .from('profiles')
-        .upsert(updateData);
+      // 1. Executa o upsert com timeout de 8 segundos
+      const upsertPromise = supabase.from('profiles').upsert(updateData);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Supabase timeout (8s)')), 8000)
+      );
+
+      const { error } = await Promise.race([upsertPromise, timeoutPromise]);
 
       if (error) {
         console.error('[Profile] Erro no Upsert:', error);
-        
-        // Fallback imediato se as colunas novas (nickname/phone) não existirem
         if (error.message?.includes('column')) {
            console.log('[Profile] Tentando fallback seguro...');
-           const { error: error2 } = await supabase
-             .from('profiles')
-             .upsert({
+           await supabase.from('profiles').upsert({
                 id: user.id,
                 full_name: newFullName || newNickname,
                 status: newStatus,
                 country: newCountry,
                 updated_at: new Date().toISOString()
-             });
-           if (error2) throw error2;
+           });
         } else {
           throw error;
         }
@@ -81,17 +82,26 @@ const Profile = () => {
 
       console.log('[Profile] Upsert concluído. Atualizando dados globais...');
       
-      // Sincroniza o contexto global
+      // 2. Executa o refreshUser com timeout de 5 segundos
       if (refreshUser) {
-        await refreshUser();
+        try {
+          await Promise.race([
+            refreshUser(),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('refreshUser timeout (5s)')), 5000)
+            )
+          ]);
+        } catch (refreshErr) {
+          console.warn('[Profile] refreshUser falhou ou demorou demais:', refreshErr.message);
+        }
       }
       
       if (target === 'header') setIsEditingHeader(false);
       if (target === 'info') setIsEditingInfo(false);
       
     } catch (err) {
-      console.error('[Profile] Erro fatal ao salvar:', err);
-      alert('Ops! Não conseguimos salvar agora: ' + (err.message || 'Erro de conexão/banco.'));
+      console.error('[Profile] Erro fatal:', err);
+      alert('Ops! Ocorreu um erro ou a conexão demorou demais: ' + (err.message || 'Erro desconhecido'));
     } finally {
       setIsSaving(false);
       console.log('[Profile] Ciclo de salvamento finalizado.');
