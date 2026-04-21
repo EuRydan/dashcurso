@@ -43,31 +43,41 @@ const Profile = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Convert to base64
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64String = reader.result;
-      
-      setIsSaving(true);
-      try {
-        const { error } = await supabase
-          .from('profiles')
-          .upsert({ 
-            id: user.id, 
-            avatar_url: base64String,
-            updated_at: new Date()
-          });
+    // Pre-check size (e.g. 2MB max for Base64 to avoid DB limits)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('A imagem é muito grande. Escolha uma imagem de até 2MB.');
+      return;
+    }
 
-        if (error) throw error;
-        await refreshUser();
-      } catch (err) {
-        console.error('Error updating avatar:', err);
-        alert('Erro ao atualizar foto.');
-      } finally {
-        setIsSaving(false);
-      }
-    };
-    reader.readAsDataURL(file);
+    setIsSaving(true);
+
+    try {
+      // Use standard FileReader with a Promise for cleaner async flow
+      const base64String = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          avatar_url: base64String,
+          updated_at: new Date()
+        });
+
+      if (error) throw error;
+      
+      // Update local context
+      await refreshUser();
+    } catch (err) {
+      console.error('Error updating avatar:', err);
+      alert('Erro ao atualizar foto. Tente novamente com uma imagem menor.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -76,9 +86,8 @@ const Profile = () => {
         <div className="hero-content">
           <div className="avatar-big-wrapper" onClick={handleAvatarClick}>
             <img src={user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.name?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`} alt="Profile" />
-            <div className="btn-edit-photo">
-              <Camera size={16} />
-              <span>Alterar Foto</span>
+            <div className="btn-edit-photo-minimal">
+              <Camera size={18} />
             </div>
             <input 
               type="file" 
@@ -90,28 +99,37 @@ const Profile = () => {
           </div>
           <div className="hero-text">
             {isEditing ? (
-              <div className="edit-name-group">
+              <div className="edit-name-container">
                 <input 
                   type="text" 
                   value={newName} 
                   onChange={(e) => setNewName(e.target.value)}
-                  className="edit-input"
+                  className="modern-edit-input"
                   autoFocus
+                  onBlur={() => !newName.trim() && setIsEditing(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleUpdateName();
+                    if (e.key === 'Escape') setIsEditing(false);
+                  }}
                 />
-                <button className="btn-save-mini" onClick={handleUpdateName} disabled={isSaving}>
-                  {isSaving ? <Loader2 className="spin" size={14} /> : <Save size={14} />}
-                </button>
-                <button className="btn-cancel-mini" onClick={() => setIsEditing(false)}>
-                  <X size={14} />
-                </button>
+                <div className="edit-actions">
+                  <button className="btn-save-glow" onClick={handleUpdateName} disabled={isSaving}>
+                    {isSaving ? <Loader2 className="spin" size={16} /> : <Save size={16} />}
+                  </button>
+                  <button className="btn-close-edit" onClick={() => setIsEditing(false)}>
+                    <X size={16} />
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="display-name-group" onClick={() => setIsEditing(true)}>
                 <h1>{user?.name || 'Alex Rivers'}</h1>
-                <Edit2 size={16} className="text-secondary" />
+                <div className="edit-trigger">
+                  <Edit2 size={18} />
+                </div>
               </div>
             )}
-            <p className="text-secondary">Estudante • Desde 2026</p>
+            <p className="status-label">Estudante • Desde 2026</p>
           </div>
         </div>
       </header>
