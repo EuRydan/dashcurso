@@ -133,9 +133,16 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const refreshUser = async () => {
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    if (authUser) await fetchUserProfile(authUser);
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Erro no signout:', err);
+    } finally {
+      localStorage.removeItem(CACHE_KEY);
+      setUser(null);
+      window.location.href = '/login'; 
+    }
   };
 
   return (
@@ -144,6 +151,7 @@ export const AppProvider = ({ children }) => {
       toggleTheme: () => {},
       user,
       refreshUser,
+      logout,
       loading
     }}>
       {children}

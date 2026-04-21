@@ -7,7 +7,7 @@ import './Profile.css';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, refreshUser } = useAppContext();
+  const { user, refreshUser, logout } = useAppContext();
   const fileInputRef = useRef(null);
   
   // Independent Editing States
@@ -119,9 +119,8 @@ const Profile = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/login', { replace: true });
+  const handleLogout = () => {
+    logout();
   };
 
   // Email Change Flow
