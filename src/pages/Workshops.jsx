@@ -134,17 +134,15 @@ const Workshops = () => {
           <h3>Biblioteca Completa</h3>
         </div>
 
-        {/* GRID SECUNDÁRIO STATUS CRÚ */}
-        <section className="workshops-empty-grid">
-           <div className="empty-state-card glass" style={{ minHeight: 'auto', padding: '48px 32px' }}>
-              <div className="empty-icon-box" style={{ backgroundColor: 'transparent', border: '1px dashed var(--color-border)', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
-                 <Video size={24} />
-              </div>
-              <h4 style={{ fontSize: '18px', marginBottom: '8px' }}>Sua Biblioteca está em dia</h4>
-              <p style={{ fontSize: '14px', maxWidth: '350px', margin: '0 auto', color: 'var(--color-text-secondary)' }}>
-                Você não possui outras reuniões anteriores arquivadas em seu histórico atual. Fique ligado na agenda e assista acima à sua primeira aula masterclass ao vivo!
-              </p>
+        {/* GRID SECUNDÁRIO STATUS LIMPO */}
+        <section className="workshops-empty-clean">
+           <div className="empty-icon-clean">
+              <Video size={32} strokeWidth={1.5} />
            </div>
+           <h4>Sua Biblioteca está em dia</h4>
+           <p>
+             Você não possui outras reuniões anteriores arquivadas em seu histórico atual. Fique ligado na agenda e assista acima à sua primeira aula masterclass ao vivo!
+           </p>
         </section>
 
       </div>
