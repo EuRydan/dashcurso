@@ -457,12 +457,134 @@
 .mt-4 { margin-top: 24px; }
 .mt-2 { margin-top: 12px; }
 
-.btn-ghost {
-  background: none;
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* Edit Header Modern Card */
+.edit-profile-header-card {
+  padding: 24px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: slideDown 0.3s ease-out;
+  max-width: 500px;
+  border-radius: 16px;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.edit-header-row {
+  display: flex;
+  gap: 20px;
+}
+
+.header-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.header-input-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-secondary);
+  font-weight: 700;
+}
+
+.header-edit-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #fff;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.header-edit-input:focus {
+  border-color: var(--color-primary);
+  background: rgba(255,255,255,0.08);
+}
+
+.header-edit-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-save-minimal, .btn-cancel-minimal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-save-minimal {
+  background: var(--color-primary);
+  color: #0c1a01;
+  border: none;
+}
+
+.btn-save-minimal:hover {
+  background: #b4f14a;
+  transform: translateY(-1px);
+}
+
+.btn-cancel-minimal {
+  background: transparent;
   border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
 }
+
+.btn-cancel-minimal:hover {
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+}
+
+/* Card Actions Small */
+.card-actions-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-save-small, .btn-cancel-small {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-save-small {
+  background: var(--color-primary);
+  color: #0c1a01;
+  border: none;
+}
+
+.btn-cancel-small {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.btn-save-small:hover { transform: scale(1.1); }
+.btn-cancel-small:hover { transform: scale(1.1); color: #fff; }
+
 

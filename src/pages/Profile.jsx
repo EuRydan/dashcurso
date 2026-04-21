@@ -8,7 +8,10 @@ const Profile = () => {
   const { user, refreshUser } = useAppContext();
   const fileInputRef = useRef(null);
   
-  const [isEditing, setIsEditing] = useState(false);
+  // Independent Editing States
+  const [isEditingHeader, setIsEditingHeader] = useState(false);
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
+
   const [newNickname, setNewNickname] = useState(user?.nickname || '');
   const [newFullName, setNewFullName] = useState(user?.full_name || '');
   const [newStatus, setNewStatus] = useState(user?.status || 'Estudante');
@@ -23,7 +26,7 @@ const Profile = () => {
   const [otpToken, setOtpToken] = useState('');
   const [emailError, setEmailError] = useState('');
 
-  const handleUpdateProfile = async () => {
+  const handleUpdateProfile = async (target) => {
     setIsSaving(true);
     try {
       const { error } = await supabase
@@ -40,7 +43,9 @@ const Profile = () => {
 
       if (error) throw error;
       await refreshUser();
-      setIsEditing(false);
+      
+      if (target === 'header') setIsEditingHeader(false);
+      if (target === 'info') setIsEditingInfo(false);
     } catch (err) {
       console.error('Error updating profile:', err);
       alert('Erro ao atualizar perfil.');
@@ -211,37 +216,45 @@ const Profile = () => {
             />
           </div>
           <div className="hero-text">
-            {isEditing ? (
-              <div className="edit-profile-container">
-                <div className="edit-name-row">
-                  <input 
-                    type="text" 
-                    value={newNickname} 
-                    onChange={(e) => setNewNickname(e.target.value)}
-                    className="modern-edit-input"
-                    placeholder="Apelido"
-                    autoFocus
-                  />
-                  <div className="edit-actions">
-                    <button className="btn-save-glow" onClick={handleUpdateProfile} disabled={isSaving}>
-                      {isSaving ? <Loader2 className="spin" size={16} /> : <Save size={16} />}
-                    </button>
-                    <button className="btn-close-edit" onClick={() => setIsEditing(false)}>
-                      <X size={16} />
-                    </button>
+            {isEditingHeader ? (
+              <div className="edit-profile-header-card glass-card">
+                <div className="edit-header-row">
+                  <div className="header-input-group">
+                    <label>Apelido</label>
+                    <input 
+                      type="text" 
+                      value={newNickname} 
+                      onChange={(e) => setNewNickname(e.target.value)}
+                      className="header-edit-input"
+                      placeholder="Ex: Ryanzin"
+                      autoFocus
+                    />
+                  </div>
+                  <div className="header-input-group">
+                    <label>Status</label>
+                    <input 
+                      type="text" 
+                      value={newStatus} 
+                      onChange={(e) => setNewStatus(e.target.value)}
+                      className="header-edit-input"
+                      placeholder="Ex: Estudante"
+                    />
                   </div>
                 </div>
-                <input 
-                  type="text" 
-                  value={newStatus} 
-                  onChange={(e) => setNewStatus(e.target.value)}
-                  className="status-edit-input"
-                  placeholder="Seu status (ex: Estudante)"
-                />
+                <div className="header-edit-actions">
+                  <button className="btn-save-minimal" onClick={() => handleUpdateProfile('header')} disabled={isSaving}>
+                    {isSaving ? <Loader2 className="spin" size={16} /> : <Save size={16} />}
+                    <span>Salvar</span>
+                  </button>
+                  <button className="btn-cancel-minimal" onClick={() => setIsEditingHeader(false)}>
+                    <X size={16} />
+                    <span>Cancelar</span>
+                  </button>
+                </div>
               </div>
             ) : (
               <>
-                <div className="display-name-group" onClick={() => setIsEditing(true)}>
+                <div className="display-name-group" onClick={() => setIsEditingHeader(true)}>
                   <h1>{user?.nickname || 'Usuário'}</h1>
                   <div className="edit-trigger visible">
                     <Edit2 size={18} />
@@ -268,13 +281,23 @@ const Profile = () => {
           <div className="personal-info-square glass-card">
             <div className="card-title-row">
               <h3>Informações Pessoais</h3>
-              {!isEditing && <Edit2 size={18} className="icon-btn-subtle" onClick={() => setIsEditing(true)} />}
+              {!isEditingInfo && <Edit2 size={18} className="icon-btn-subtle" onClick={() => setIsEditingInfo(true)} />}
+              {isEditingInfo && (
+                <div className="card-actions-row">
+                  <button className="btn-save-small" onClick={() => handleUpdateProfile('info')} disabled={isSaving}>
+                    {isSaving ? <Loader2 className="spin" size={14} /> : <Save size={14} />}
+                  </button>
+                  <button className="btn-cancel-small" onClick={() => setIsEditingInfo(false)}>
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
             </div>
             
             <div className="info-stack">
               <div className="info-block">
                 <label>Nome Completo</label>
-                {isEditing ? (
+                {isEditingInfo ? (
                   <input type="text" value={newFullName} onChange={(e) => setNewFullName(e.target.value)} className="info-edit-input" placeholder="Seu nome real" />
                 ) : (
                   <span>{user?.full_name || 'Não informado'}</span>
@@ -285,7 +308,7 @@ const Profile = () => {
                 <label>Endereço de E-mail</label>
                 <div className="email-display-row">
                   <span className="read-only-text">{user?.email}</span>
-                  {isEditing && (
+                  {isEditingInfo && (
                     <button className="btn-change-email" onClick={() => setEmailModalStep(1)}>Alterar</button>
                   )}
                 </div>
@@ -293,7 +316,7 @@ const Profile = () => {
 
               <div className="info-block">
                 <label>Telefone</label>
-                {isEditing ? (
+                {isEditingInfo ? (
                   <input type="text" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} className="info-edit-input" placeholder="+55 (00) 00000-0000" />
                 ) : (
                   <span>{user?.phone || '+55 (00) 00000-0000'}</span>
@@ -302,7 +325,7 @@ const Profile = () => {
 
               <div className="info-block">
                 <label>País / Região</label>
-                {isEditing ? (
+                {isEditingInfo ? (
                   <input type="text" value={newCountry} onChange={(e) => setNewCountry(e.target.value)} className="info-edit-input" placeholder="Brasil" />
                 ) : (
                   <span>{user?.country || 'Brasil'}</span>
