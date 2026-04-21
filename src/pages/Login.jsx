@@ -54,20 +54,35 @@ const Login = () => {
 
   const handleValidationSubmit = async (e, isLoginForm) => {
     e.preventDefault();
+    console.log(`[Login] Iniciando fluxo de ${isLoginForm ? 'Login' : 'Cadastro'}...`);
     setError('');
     setLoading(true);
 
     try {
       if (isLoginForm) {
         if (!email || !password) throw new Error('Preencha e-mail e senha.');
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-        if (signInError) throw new Error('Credenciais inválidas. Tente novamente.');
+        
+        console.log('[Login] Tentando signInWithPassword...');
+        const authPromise = supabase.auth.signInWithPassword({ email, password });
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Tempo de resposta do servidor excedido (timeout)')), 8000)
+        );
+
+        const { error: signInError } = await Promise.race([authPromise, timeoutPromise]);
+        
+        if (signInError) {
+          console.error('[Login] Erro no login:', signInError);
+          throw new Error('Credenciais inválidas ou erro de conexão.');
+        }
+
+        console.log('[Login] Login bem-sucedido! Redirecionando...');
         navigate('/');
       } else {
         if (!regEmail || !regPassword || !regFirstName || !regLastName) {
           throw new Error('Preencha todos os campos obrigatórios.');
         }
         
+        console.log('[Login] Tentando signUp...');
         const { error: signUpError } = await supabase.auth.signUp({
           email: regEmail,
           password: regPassword,
@@ -81,13 +96,16 @@ const Login = () => {
         });
         
         if (signUpError) throw signUpError;
+        console.log('[Login] Cadastro iniciado. Indo para passo 2 (OTP).');
         setRegStep(1);
-        setResendTimer(60); // Inicia timer de 60s
+        setResendTimer(60); 
       }
     } catch (err) {
+      console.error('[Login] Erro capturado:', err.message);
       setError(err.message);
     } finally {
       setLoading(false);
+      console.log('[Login] Fluxo finalizado.');
     }
   };
 
