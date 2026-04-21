@@ -42,8 +42,12 @@ const Home = () => {
           ))}
         </section>
       ) : (
-        <div className="empty-state-minimal">
-          <p>Você não possui cursos ativos no momento.</p>
+        <div className="empty-state-clean">
+          <div className="empty-icon-clean">
+            <Play size={32} strokeWidth={1.5} />
+          </div>
+          <h4>Nenhuma atividade recente</h4>
+          <p>Você ainda não iniciou nenhum curso. Explore o catálogo e comece sua jornada hoje mesmo!</p>
         </div>
       )}
 

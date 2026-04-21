@@ -135,7 +135,7 @@ const Workshops = () => {
         </div>
 
         {/* GRID SECUNDÁRIO STATUS LIMPO */}
-        <section className="workshops-empty-clean">
+        <section className="empty-state-clean">
            <div className="empty-icon-clean">
               <Video size={32} strokeWidth={1.5} />
            </div>

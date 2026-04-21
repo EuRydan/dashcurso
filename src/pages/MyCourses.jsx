@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Lock } from 'lucide-react';
+import { Play, Lock, BookOpen } from 'lucide-react';
 import './MyCourses.css';
 
 const MyCourses = () => {
@@ -47,9 +47,12 @@ const MyCourses = () => {
               </div>
             </>
           ) : (
-            <div className="empty-state-minimal" style={{ textAlign: 'left' }}>
-              <h2 className="text-secondary">Nenhuma aula ativa</h2>
-              <p className="text-secondary">O conteúdo das aulas aparecerá aqui assim que você iniciar um curso.</p>
+            <div className="empty-state-clean" style={{ textAlign: 'center' }}>
+              <div className="empty-icon-clean">
+                <BookOpen size={32} strokeWidth={1.5} />
+              </div>
+              <h4>Nenhuma aula ativa</h4>
+              <p>O conteúdo das aulas aparecerá aqui assim que você iniciar um curso em sua trilha.</p>
             </div>
           )}
         </div>

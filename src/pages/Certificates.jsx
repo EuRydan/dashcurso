@@ -61,9 +61,12 @@ const Certificates = () => {
             </div>
           ))
         ) : (
-          <div className="empty-state-minimal">
-            <p className="text-secondary">Você ainda não possui certificados disponíveis.</p>
-            <p className="text-secondary" style={{ fontSize: '14px' }}>Complete os módulos para conquistar sua certificação.</p>
+          <div className="empty-state-clean">
+            <div className="empty-icon-clean">
+              <Award size={32} strokeWidth={1.5} />
+            </div>
+            <h4>Conquiste sua primeira certificação</h4>
+            <p>Você ainda não possui certificados disponíveis. Complete os módulos e masterclasses para conquistar sua certificação oficial.</p>
           </div>
         )}
       </section>
