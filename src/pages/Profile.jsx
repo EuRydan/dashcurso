@@ -505,36 +505,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
-        <section className="profile-col-right">
-          <div className="progress-square glass-card">
-            <h3>Meu Progresso</h3>
-            <div className="empty-state-minimal-v2">
-              <div className="empty-progress-border" />
-              <p className="text-secondary-small">O acompanhamento de progresso das suas trilhas aparecerá aqui assim que você iniciar o primeiro módulo.</p>
-            </div>
-          </div>
-
-          <div className="security-square glass-card">
-            <div className="security-content">
-              <div>
-                <h3>Segurança</h3>
-                <p className="text-secondary-small">Gerencie sua senha e acessos da conta.</p>
-              </div>
-              <button className="btn-secondary-modern" onClick={() => window.location.href='/settings'}>Alterar Senha</button>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <footer className="profile-actions-footer">
-        <button className="btn-logout-link" onClick={handleLogout}>
-          <LogOut size={18} />
-          <span>Sair da Conta</span>
-        </button>
-      </footer>
-    </div>
-  );
-};
-
-export default Profile;
