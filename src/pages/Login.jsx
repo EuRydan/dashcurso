@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Wand2, ShieldCheck, Loader2, Mail, Lock, User, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, Wand2, ShieldCheck, Loader2, Mail, Lock, User, ArrowRight, Eye, EyeOff, Sparkles, Rocket } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './Login.css';
 
@@ -45,17 +45,17 @@ const Login = () => {
     try {
       if (isLoginForm) {
         if (!email || !password) throw new Error('Preencha e-mail e senha.');
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw new Error('Credenciais inválidas. Tente novamente.');
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInError) throw new Error('Credenciais inválidas. Tente novamente.');
         navigate('/');
       } else {
         if (!regEmail || !regPassword || !regName) throw new Error('Preencha todos os campos.');
-        const { error } = await supabase.auth.signUp({
+        const { error: signUpError } = await supabase.auth.signUp({
           email: regEmail,
           password: regPassword,
           options: { data: { full_name: regName } }
         });
-        if (error) throw error;
+        if (signUpError) throw signUpError;
         alert('Conta criada! Verifique seu e-mail para confirmar o acesso.');
         setIsLogin(true);
       }
@@ -69,12 +69,12 @@ const Login = () => {
   const handleVisitorLogin = async () => {
     setError('');
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ 
+    const { error: visitorError } = await supabase.auth.signInWithPassword({ 
       email: 'visitante@lumen.com.br', 
       password: 'lumen123' 
     });
-    if (error) {
-      setError('Acesso de visitante indisponível no momento.');
+    if (visitorError) {
+      setError('Acesso de visitante indisponível.');
       setLoading(false);
     } else {
       navigate('/');
@@ -83,131 +83,151 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error: googleError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin }
     });
-    if (error) { setError(err.message); setLoading(false); }
+    if (googleError) { setError(googleError.message); setLoading(false); }
   };
 
   return (
     <div className="auth-master-container">
-      <div className="auth-card-wrapper">
-        <div className="auth-card glass-premium">
-          <header className="auth-header-new">
-             <h1>{isLogin ? (isMagicFlow ? 'Validar Acesso' : 'Bem-vindo') : 'Criar Conta'}<span className="dot">.</span></h1>
-             <p>{isLogin ? 'Inicie sua jornada na plataforma Vies Experience' : 'Preencha os dados para começar'}</p>
-          </header>
-
-          <div className="auth-content-flow">
-            {isLogin ? (
-              // LOGIN CONTENT
-              isMagicFlow ? (
-                <form onSubmit={(e) => e.preventDefault()} className="auth-form-modern">
-                  <div className="magic-input-wrapper">
-                    <input 
-                      type="text" 
-                      placeholder="000000" 
-                      maxLength={6}
-                      value={magicCodeInput}
-                      onChange={(e) => setMagicCodeInput(e.target.value.replace(/\D/g, ''))}
-                      className="magic-field"
-                      autoFocus
-                    />
-                    <p className="hint">Enviamos um código para seu e-mail</p>
-                  </div>
-                  <button type="submit" className="btn-primary-new" disabled={loading || magicCodeInput.length < 6}>
-                    {loading ? <Loader2 className="spin" size={20} /> : 'Confirmar Código'}
-                  </button>
-                  <button type="button" className="btn-link" onClick={() => setIsMagicFlow(false)}>Voltar ao login comum</button>
-                </form>
+      <div className={`auth-split-layout ${isLogin ? 'is-login-state' : 'is-register-state'}`}>
+        
+        {/* PAINEL VISUAL (SLIDING) */}
+        <div className="auth-visual-panel">
+          <div className="visual-overlay"></div>
+          <div className="visual-content">
+            <div className="brand-badge">Vies Experience</div>
+            <div className="text-anim-group">
+              {isLogin ? (
+                <>
+                  <h2>Bom te ver de volta! <Rocket size={32} /></h2>
+                  <p>Acesse seu painel e continue sua jornada de aprendizado de onde parou.</p>
+                </>
               ) : (
                 <>
-                  <button className="btn-social" onClick={handleGoogleLogin}>
-                    <GoogleIcon />
-                    <span>Entrar com Google</span>
+                  <h2>Sua jornada começa aqui <Sparkles size={32} /></h2>
+                  <p>Crie sua conta em poucos segundos e tenha acesso ilimitado aos melhores conteúdos.</p>
+                </>
+              )}
+            </div>
+            
+            <div className="visual-footer">
+              <div className="step-indicator">
+                <div className={`step-dot ${isLogin ? 'active' : ''}`} />
+                <div className={`step-dot ${!isLogin ? 'active' : ''}`} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CONTAINER DE FORMULÁRIOS */}
+        <div className="auth-forms-container">
+          
+          {/* LOGIN FORM */}
+          <div className={`auth-form-section ${isLogin ? 'active' : 'inactive'}`}>
+            <header className="form-header">
+               <h1>Login<span className="dot">.</span></h1>
+               <p>Insira suas credenciais de acesso</p>
+            </header>
+
+            <div className="form-body">
+               <button className="btn-social-outline" onClick={handleGoogleLogin}>
+                  <GoogleIcon />
+                  <span>Google</span>
+               </button>
+
+               <div className="section-divider"><span>ou use seu e-mail</span></div>
+
+               <form onSubmit={(e) => handleValidationSubmit(e, true)} className="main-form">
+                  <div className="field-modern">
+                     <Mail size={18} className="field-icon-left" />
+                     <input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                  </div>
+
+                  <div className="field-modern">
+                     <Lock size={18} className="field-icon-left" />
+                     <input 
+                        type={showPassword ? "text" : "password"} 
+                        placeholder="Senha" 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        required 
+                     />
+                     <button type="button" className="field-icon-right" onClick={() => setShowPassword(!showPassword)}>
+                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                     </button>
+                  </div>
+
+                  <div className="form-links">
+                     <a href="#reset" className="link-subtle">Esqueceu a senha?</a>
+                  </div>
+
+                  {error && isLogin && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
+
+                  <button type="submit" className="btn-vies-primary" disabled={loading}>
+                    {loading ? <Loader2 className="spin" size={20} /> : (
+                      <>
+                        <span>Acessar</span>
+                        <ArrowRight size={18} />
+                      </>
+                    )}
                   </button>
 
-                  <div className="separator"><span>ou use seu e-mail</span></div>
+                  <div className="alternative-entry">
+                     <button type="button" className="btn-magic" onClick={() => setIsMagicFlow(true)}>
+                        <Wand2 size={16} /> Link Mágico
+                     </button>
+                     <button type="button" className="btn-visitor-new" onClick={handleVisitorLogin}>
+                        <ShieldCheck size={16} /> Ver Demo
+                     </button>
+                  </div>
+               </form>
+            </div>
 
-                  <form onSubmit={(e) => handleValidationSubmit(e, true)} className="auth-form-modern">
-                    <div className="input-field-new">
-                       <Mail size={18} className="field-icon" />
-                       <input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                    </div>
+            <footer className="form-footer">
+               <span>Novo por aqui?</span>
+               <button onClick={() => { setIsLogin(false); setError(''); }}>Criar minha conta</button>
+            </footer>
+          </div>
 
-                    <div className="input-field-new">
-                       <Lock size={18} className="field-icon" />
-                       <input 
-                          type={showPassword ? "text" : "password"} 
-                          placeholder="Senha" 
-                          value={password} 
-                          onChange={(e) => setPassword(e.target.value)} 
-                          required 
-                       />
-                       <button type="button" className="pw-toggle" onClick={() => setShowPassword(!showPassword)}>
-                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                       </button>
-                    </div>
+          {/* REGISTER FORM */}
+          <div className={`auth-form-section ${!isLogin ? 'active' : 'inactive'}`}>
+            <header className="form-header">
+               <h1>Cadastro<span className="dot">.</span></h1>
+               <p>Faça parte da nossa comunidade</p>
+            </header>
 
-                    <div className="form-utils">
-                       <a href="#reset" className="link-muted">Esqueceu a senha?</a>
-                    </div>
-
-                    {error && <div className="error-badge"><AlertCircle size={14} /> {error}</div>}
-
-                    <button type="submit" className="btn-primary-new" disabled={loading}>
-                      {loading ? <Loader2 className="spin" size={20} /> : (
-                        <>
-                          <span>Acessar</span>
-                          <ArrowRight size={18} />
-                        </>
-                      )}
-                    </button>
-
-                    <div className="secondary-actions">
-                       <button type="button" className="btn-subtle" onClick={() => setIsMagicFlow(true)}>
-                          <Wand2 size={16} /> Link Mágico
-                       </button>
-                       <button type="button" className="btn-subtle visitor" onClick={handleVisitorLogin}>
-                          <ShieldCheck size={16} /> Visitante
-                       </button>
-                    </div>
-                  </form>
-                </>
-              )
-            ) : (
-              // REGISTER CONTENT
-              <form onSubmit={(e) => handleValidationSubmit(e, false)} className="auth-form-modern">
-                <div className="input-field-new">
-                   <User size={18} className="field-icon" />
+            <div className="form-body">
+              <form onSubmit={(e) => handleValidationSubmit(e, false)} className="main-form">
+                <div className="field-modern">
+                   <User size={18} className="field-icon-left" />
                    <input type="text" placeholder="Nome completo" value={regName} onChange={(e) => setRegName(e.target.value)} required />
                 </div>
-                <div className="input-field-new">
-                   <Mail size={18} className="field-icon" />
+                <div className="field-modern">
+                   <Mail size={18} className="field-icon-left" />
                    <input type="email" placeholder="E-mail" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} required />
                 </div>
-                <div className="input-field-new">
-                   <Lock size={18} className="field-icon" />
+                <div className="field-modern">
+                   <Lock size={18} className="field-icon-left" />
                    <input type="password" placeholder="Defina uma senha" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} required />
                 </div>
 
-                {error && <div className="error-badge"><AlertCircle size={14} /> {error}</div>}
+                {error && !isLogin && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
 
-                <button type="submit" className="btn-primary-new" disabled={loading}>
-                   {loading ? <Loader2 className="spin" size={20} /> : 'Criar minha conta'}
+                <button type="submit" className="btn-vies-primary" disabled={loading}>
+                   {loading ? <Loader2 className="spin" size={20} /> : 'Finalizar Cadastro'}
                 </button>
               </form>
-            )}
+            </div>
+
+            <footer className="form-footer">
+               <span>Já possui conta?</span>
+               <button onClick={() => { setIsLogin(true); setError(''); }}>Fazer login</button>
+            </footer>
           </div>
 
-          <footer className="auth-footer-new">
-             {isLogin ? (
-               <p>Não tem conta? <button onClick={() => { setIsLogin(false); setError(''); }}>Registre-se Gratuitamente</button></p>
-             ) : (
-               <p>Já possui conta? <button onClick={() => { setIsLogin(true); setError(''); }}>Fazer Login</button></p>
-             )}
-          </footer>
         </div>
       </div>
     </div>

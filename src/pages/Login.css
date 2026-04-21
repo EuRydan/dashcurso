@@ -2,91 +2,192 @@
 
 :root {
   --vies-primary: #a3e635;
-  --vies-accent: #3b82f6;
-  --vies-bg: #0c0c0b;
+  --vies-dark: #0c0c0b;
+  --vies-card: #141413;
+  --vies-text: #ffffff;
+  --vies-muted: #737373;
 }
 
 .auth-master-container {
   width: 100vw;
   min-height: 100vh;
-  background-color: #0c0c0b;
+  background-color: var(--vies-dark);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Sora', sans-serif;
-  padding: 40px 20px;
+  overflow-x: hidden;
+  padding: 20px;
 }
 
-.auth-card-wrapper {
-  width: 100%;
-  max-width: 440px;
-}
-
-.glass-premium {
-  background: rgba(23, 23, 22, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+.auth-split-layout {
+  width: 1100px;
+  height: 720px;
+  background: var(--vies-card);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 32px;
-  padding: 48px 40px;
-  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8);
+  border-radius: 40px;
   display: flex;
-  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.8);
 }
 
-.auth-header-new {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.logo-placeholder {
-  width: 48px;
-  height: 48px;
-  background: var(--lumen-primary);
-  color: #000;
-  font-weight: 800;
-  border-radius: 12px;
+/* --- PAINEL VISUAL DESLIZANTE --- */
+.auth-visual-panel {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  z-index: 20;
+  transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px;
-  font-size: 20px;
+  color: white;
+  padding: 60px;
+  background: linear-gradient(135deg, #0f1c0e 0%, #060905 100%);
 }
 
-.auth-header-new h1 {
-  font-size: 28px;
+/* Estado da transição */
+.is-login-state .auth-visual-panel {
+  transform: translateX(100%); /* Login: Painel à Direita */
+}
+
+.is-register-state .auth-visual-panel {
+  transform: translateX(0%); /* Cadastro: Painel à Esquerda */
+}
+
+.visual-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at bottom left, rgba(163, 230, 53, 0.15), transparent 70%);
+  z-index: 1;
+}
+
+.visual-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.brand-badge {
+  background: rgba(163, 230, 53, 0.1);
+  color: var(--vies-primary);
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  width: fit-content;
+  border: 1px solid rgba(163, 230, 53, 0.2);
+}
+
+.text-anim-group h2 {
+  font-size: 42px;
   font-weight: 800;
-  letter-spacing: -1px;
-  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  letter-spacing: -2px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.text-anim-group p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 380px;
+}
+
+.step-indicator {
+  display: flex;
+  gap: 10px;
+}
+
+.step-dot {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  transition: all 0.5s ease;
+}
+
+.step-dot.active {
+  background: var(--vies-primary);
+  width: 60px;
+}
+
+/* --- CONTAINER DE FORMULÁRIOS --- */
+.auth-forms-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  position: relative;
+}
+
+.auth-form-section {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  padding: 80px 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.6s ease;
+  z-index: 10;
+}
+
+/* Posicionamento dos formulários por estado */
+.is-login-state .auth-form-section.active {
+  left: 0; /* Login: Form à Esquerda */
+  opacity: 1;
+  visibility: visible;
+}
+
+.is-register-state .auth-form-section.active {
+  left: 50%; /* Cadastro: Form à Direita */
+  opacity: 1;
+  visibility: visible;
+}
+
+.auth-form-section.inactive {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* --- Estilo dos Formulários --- */
+.form-header {
+  margin-bottom: 40px;
+}
+
+.form-header h1 {
+  font-size: 36px;
+  font-weight: 800;
+  color: white;
   margin-bottom: 8px;
 }
 
-.auth-header-new p {
-  color: #a3a3a3;
-  font-size: 14px;
+.form-header p {
+  color: var(--vies-muted);
+  font-size: 15px;
 }
 
-.dot { color: var(--lumen-primary); }
-
-/* --- Flow Content --- */
-.auth-content-flow {
+.form-body {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
-.auth-form-modern {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* --- Social Buttons --- */
-.btn-social {
+.btn-social-outline {
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
+  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
+  color: white;
   padding: 14px;
   border-radius: 16px;
   font-size: 14px;
@@ -96,243 +197,199 @@
   justify-content: center;
   gap: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 }
 
-.btn-social:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
+.btn-social-outline:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
-.separator {
+.section-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 4px 0;
+  gap: 15px;
+  margin: 10px 0;
 }
 
-.separator::before, .separator::after {
+.section-divider::before, .section-divider::after {
   content: '';
   flex: 1;
   height: 1px;
   background: rgba(255, 255, 255, 0.05);
 }
 
-.separator span {
-  color: #525252;
+.section-divider span {
+  color: #404040;
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
-/* --- Inputs --- */
-.input-field-new {
+.main-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field-modern {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.field-icon {
+.field-icon-left {
   position: absolute;
-  left: 16px;
-  color: #737373;
+  left: 18px;
+  color: var(--vies-muted);
   pointer-events: none;
 }
 
-.input-field-new input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 16px 16px 16px 48px;
-  color: #fff;
-  font-size: 15px;
-  font-family: inherit;
-  transition: all 0.2s ease;
-  outline: none;
-}
-
-.input-field-new input:focus {
-  border-color: var(--lumen-primary);
-  background: rgba(163, 230, 53, 0.03);
-  box-shadow: 0 0 0 1px var(--lumen-primary);
-}
-
-.pw-toggle {
+.field-icon-right {
   position: absolute;
-  right: 16px;
+  right: 18px;
   background: none;
   border: none;
-  color: #737373;
+  color: var(--vies-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
 }
 
-.form-utils {
+.field-modern input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 18px 20px 18px 52px;
+  color: white;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.field-modern input:focus {
+  border-color: var(--vies-primary);
+  background: rgba(163, 230, 53, 0.03);
+}
+
+.form-links {
   display: flex;
   justify-content: flex-end;
-  padding: 0 4px;
 }
 
-.link-muted {
-  color: #737373;
-  font-size: 12px;
+.link-subtle {
+  color: var(--vies-muted);
+  font-size: 13px;
   text-decoration: none;
-  transition: color 0.2s;
 }
 
-.link-muted:hover { color: #fff; }
-
-/* --- Primary Button --- */
-.btn-primary-new {
+.btn-vies-primary {
   background: var(--vies-primary);
   color: #000;
   border: none;
   border-radius: 16px;
-  padding: 16px;
+  padding: 18px;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  margin-top: 8px;
+  gap: 12px;
+  transition: all 0.3s;
+  margin-top: 10px;
 }
 
-.btn-primary-new:hover:not(:disabled) {
+.btn-vies-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(163, 230, 53, 0.3);
+  box-shadow: 0 15px 30px rgba(163, 230, 53, 0.3);
   background: #bef264;
 }
 
-.btn-primary-new:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* --- Secondary Actions --- */
-.secondary-actions {
+.alternative-entry {
   display: flex;
   gap: 12px;
-  margin-top: 4px;
+  margin-top: 5px;
 }
 
-.btn-subtle {
+.btn-magic, .btn-visitor-new {
   flex: 1;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #a3a3a3;
+  color: var(--vies-muted);
   padding: 12px;
   border-radius: 12px;
   font-size: 13px;
-  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
-.btn-subtle:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-}
-
-.btn-subtle.visitor {
-  border: 1px dashed rgba(163, 230, 53, 0.3);
+.btn-visitor-new {
+  border-color: rgba(163, 230, 53, 0.2);
   color: var(--vies-primary);
 }
 
-.btn-subtle.visitor:hover {
-  border-style: solid;
-  background: rgba(163, 230, 53, 0.05);
-}
-
-/* --- Footer --- */
-.auth-footer-new {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+.form-footer {
+  margin-top: 40px;
   text-align: center;
+  font-size: 14px;
+  color: var(--vies-muted);
 }
 
-.auth-footer-new p {
-  font-size: 13px;
-  color: #737373;
-}
-
-.auth-footer-new button {
+.form-footer button {
   background: none;
   border: none;
-  color: var(--lumen-primary);
+  color: var(--vies-primary);
   font-weight: 700;
   cursor: pointer;
-  margin-left: 4px;
-  transition: opacity 0.2s;
+  margin-left: 6px;
 }
 
-.auth-footer-new button:hover { opacity: 0.8; }
-
-/* --- Error Badge --- */
-.error-badge {
+.error-box {
   background: rgba(239, 68, 68, 0.1);
   color: #f87171;
-  padding: 12px 16px;
+  padding: 12px;
   border-radius: 12px;
   font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   border: 1px solid rgba(239, 68, 68, 0.1);
 }
-
-/* --- Magic Flow --- */
-.magic-input-wrapper {
-  text-align: center;
-}
-
-.magic-field {
-  background: rgba(255, 255, 255, 0.03);
-  border: 2px solid var(--lumen-primary);
-  border-radius: 16px;
-  padding: 24px;
-  color: #fff;
-  font-size: 32px;
-  text-align: center;
-  letter-spacing: 12px;
-  font-weight: 800;
-  outline: none;
-  width: 100%;
-}
-
-.hint {
-  color: #737373;
-  font-size: 12px;
-  margin-top: 12px;
-}
-
-.btn-link {
-  background: none;
-  border: none;
-  color: #737373;
-  font-size: 13px;
-  cursor: pointer;
-  margin-top: 8px;
-}
-
-.btn-link:hover { color: #fff; }
 
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-/* --- Responsive --- */
-@media (max-width: 480px) {
-  .glass-premium {
-    padding: 40px 24px;
-    border-radius: 24px;
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 1024px) {
+  .auth-split-layout {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    flex-direction: column;
+    border-radius: 30px;
+  }
+  
+  .auth-visual-panel {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    transform: none !important;
+    padding: 30px;
+  }
+  
+  .auth-forms-container {
+    height: auto;
+  }
+  
+  .auth-form-section {
+    position: relative;
+    width: 100%;
+    height: auto;
+    left: 0 !important;
+    padding: 40px 30px;
   }
 }
