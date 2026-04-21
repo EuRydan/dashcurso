@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Wand2, ShieldCheck, Loader2, Mail, Lock, User, ArrowRight, Eye, EyeOff, Sparkles, Rocket } from 'lucide-react';
+import { AlertCircle, Wand2, ShieldCheck, Loader2, Mail, Lock, User, ArrowRight, Eye, EyeOff, Sparkles, Rocket, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './Login.css';
 
@@ -20,14 +20,19 @@ const Login = () => {
   // Auth Form States
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [regName, setRegName] = useState('');
-  const [regEmail, setRegEmail] = useState('');
-  const [regPassword, setRegPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isMagicFlow, setIsMagicFlow] = useState(false);
   const [magicCodeInput, setMagicCodeInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Registration Specific States
+  const [regStep, setRegStep] = useState(0); // 0: Data, 1: OTP
+  const [regFirstName, setRegFirstName] = useState('');
+  const [regLastName, setRegLastName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regOtp, setRegOtp] = useState('');
 
   useEffect(() => {
     const checkUser = async () => {
@@ -49,18 +54,52 @@ const Login = () => {
         if (signInError) throw new Error('Credenciais inválidas. Tente novamente.');
         navigate('/');
       } else {
-        if (!regEmail || !regPassword || !regName) throw new Error('Preencha todos os campos.');
+        // CADASTRO - PASSO 1
+        if (!regEmail || !regPassword || !regFirstName || !regLastName) {
+          throw new Error('Preencha todos os campos obrigatórios.');
+        }
+        
         const { error: signUpError } = await supabase.auth.signUp({
           email: regEmail,
           password: regPassword,
-          options: { data: { full_name: regName } }
+          options: { 
+            data: { 
+              full_name: `${regFirstName} ${regLastName}`,
+              first_name: regFirstName,
+              last_name: regLastName
+            } 
+          }
         });
+        
         if (signUpError) throw signUpError;
-        alert('Conta criada! Verifique seu e-mail para confirmar o acesso.');
-        setIsLogin(true);
+        
+        // Mover para o passo do OTP
+        setRegStep(1);
       }
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyRegister = async (e) => {
+    e.preventDefault();
+    if (regOtp.length !== 6) return;
+    setError('');
+    setLoading(true);
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email: regEmail,
+        token: regOtp,
+        type: 'signup'
+      });
+      if (verifyError) throw verifyError;
+      
+      alert('Conta confirmada com sucesso!');
+      navigate('/');
+    } catch (err) {
+      setError('Código inválido ou expirado.');
     } finally {
       setLoading(false);
     }
@@ -107,8 +146,17 @@ const Login = () => {
                 </>
               ) : (
                 <>
-                  <h2>Sua jornada começa aqui <Sparkles size={32} /></h2>
-                  <p>Crie sua conta em poucos segundos e tenha acesso ilimitado aos melhores conteúdos.</p>
+                  {regStep === 0 ? (
+                    <>
+                      <h2>Sua jornada começa aqui <Sparkles size={32} /></h2>
+                      <p>Crie sua conta em poucos segundos e tenha acesso ilimitado aos melhores conteúdos.</p>
+                    </>
+                  ) : (
+                    <>
+                      <h2>Quase lá! <Mail size={32} /></h2>
+                      <p>Enviamos um código de verificação para o seu e-mail. Insira-o para ativar sua conta.</p>
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -116,7 +164,8 @@ const Login = () => {
             <div className="visual-footer">
               <div className="step-indicator">
                 <div className={`step-dot ${isLogin ? 'active' : ''}`} />
-                <div className={`step-dot ${!isLogin ? 'active' : ''}`} />
+                <div className={`step-dot ${!isLogin && regStep === 0 ? 'active' : ''}`} />
+                <div className={`step-dot ${!isLogin && regStep === 1 ? 'active' : ''}`} />
               </div>
             </div>
           </div>
@@ -188,38 +237,83 @@ const Login = () => {
 
             <footer className="form-footer">
                <span>Novo por aqui?</span>
-               <button onClick={() => { setIsLogin(false); setError(''); }}>Criar minha conta</button>
+               <button onClick={() => { setIsLogin(false); setError(''); setRegStep(0); }}>Criar minha conta</button>
             </footer>
           </div>
 
           {/* REGISTER FORM */}
           <div className={`auth-form-section ${!isLogin ? 'active' : 'inactive'}`}>
             <header className="form-header">
-               <h1>Cadastro<span className="dot">.</span></h1>
-               <p>Faça parte da nossa comunidade</p>
+               <h1>{regStep === 0 ? 'Cadastro' : 'Verificação'}<span className="dot">.</span></h1>
+               <p>{regStep === 0 ? 'Faça parte da nossa comunidade' : `Insira o código enviado para ${regEmail}`}</p>
             </header>
 
             <div className="form-body">
-              <form onSubmit={(e) => handleValidationSubmit(e, false)} className="main-form">
-                <div className="field-modern">
-                   <User size={18} className="field-icon-left" />
-                   <input type="text" placeholder="Nome completo" value={regName} onChange={(e) => setRegName(e.target.value)} required />
-                </div>
-                <div className="field-modern">
-                   <Mail size={18} className="field-icon-left" />
-                   <input type="email" placeholder="E-mail" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} required />
-                </div>
-                <div className="field-modern">
-                   <Lock size={18} className="field-icon-left" />
-                   <input type="password" placeholder="Defina uma senha" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} required />
-                </div>
+              {regStep === 0 ? (
+                <>
+                  <button className="btn-social-outline" onClick={handleGoogleLogin}>
+                    <GoogleIcon />
+                    <span>Cadastrar com Google</span>
+                  </button>
 
-                {error && !isLogin && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
+                  <div className="section-divider"><span>ou preencha os dados</span></div>
 
-                <button type="submit" className="btn-vies-primary" disabled={loading}>
-                   {loading ? <Loader2 className="spin" size={20} /> : 'Finalizar Cadastro'}
-                </button>
-              </form>
+                  <form onSubmit={(e) => handleValidationSubmit(e, false)} className="main-form">
+                    <div className="name-grid">
+                      <div className="field-modern">
+                         <User size={18} className="field-icon-left" />
+                         <input type="text" placeholder="Nome" value={regFirstName} onChange={(e) => setRegFirstName(e.target.value)} required />
+                      </div>
+                      <div className="field-modern">
+                         <input type="text" placeholder="Sobrenome" value={regLastName} onChange={(e) => setRegLastName(e.target.value)} required />
+                      </div>
+                    </div>
+                    
+                    <div className="field-modern">
+                       <Mail size={18} className="field-icon-left" />
+                       <input type="email" placeholder="E-mail" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} required />
+                    </div>
+                    <div className="field-modern">
+                       <Lock size={18} className="field-icon-left" />
+                       <input type="password" placeholder="Defina uma senha" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} required />
+                    </div>
+
+                    {error && !isLogin && regStep === 0 && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
+
+                    <button type="submit" className="btn-vies-primary" disabled={loading}>
+                       {loading ? <Loader2 className="spin" size={20} /> : 'Continuar'}
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <form onSubmit={handleVerifyRegister} className="main-form">
+                  <div className="otp-modern-wrapper">
+                    <input 
+                      type="text" 
+                      maxLength="6" 
+                      placeholder="000000" 
+                      className="otp-field-big"
+                      value={regOtp}
+                      onChange={(e) => setRegOtp(e.target.value.replace(/\D/g, ''))}
+                      disabled={loading}
+                      autoFocus
+                    />
+                    <p className="otp-hint">O código pode levar até 1 minuto.</p>
+                  </div>
+
+                  {error && regStep === 1 && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
+
+                  <button type="submit" className="btn-vies-primary" disabled={loading || regOtp.length < 6}>
+                     {loading ? <Loader2 className="spin" size={20} /> : (
+                       <>
+                         <span>Finalizar Ativação</span>
+                         <CheckCircle2 size={18} />
+                       </>
+                     )}
+                  </button>
+                  <button type="button" className="btn-link-subtle" onClick={() => setRegStep(0)}>Voltar para dados</button>
+                </form>
+              )}
             </div>
 
             <footer className="form-footer">
