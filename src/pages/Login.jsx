@@ -111,23 +111,42 @@ const Login = () => {
   };
 
   const handleVerifyRegister = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (regOtp.length < 6) return;
+    
     setError('');
     setLoading(true);
+    
     try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({
+      console.log('Validando código:', regOtp);
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
         email: regEmail,
         token: regOtp,
         type: 'signup'
       });
-      if (verifyError) throw verifyError;
+
+      if (verifyError) {
+        console.error('Erro na verificação:', verifyError);
+        throw verifyError;
+      }
       
-      alert('Conta confirmada com sucesso!');
-      navigate('/');
+      console.log('Sucesso! Usuário autenticado.');
+      
+      // Limpa os dados de registro
+      setRegOtp('');
+      setLoading(false);
+      
+      // Navegação imediata
+      navigate('/', { replace: true });
+      
+      // Fallback de segurança caso o router falhe em agir
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
+
     } catch (err) {
-      setError('Código inválido ou expirado.');
-    } finally {
+      console.error('Falha no catch do verify:', err);
+      setError(err.message || 'Código inválido ou expirado.');
       setLoading(false);
     }
   };
