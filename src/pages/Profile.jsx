@@ -56,6 +56,7 @@ const Profile = () => {
   const [newStatus, setNewStatus] = useState(user?.status || 'Estudante');
   const [newCountry, setNewCountry] = useState(user?.country || 'Brasil');
   const [newPhone, setNewPhone] = useState(user?.phone || '');
+  const [newOrganization, setNewOrganization] = useState(user?.organization || 'Estudante Independente');
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -83,6 +84,7 @@ const Profile = () => {
       setNewStatus(user?.status || 'Estudante');
       setNewCountry(user?.country || 'Brasil');
       setNewPhone(user?.phone || '');
+      setNewOrganization(user?.organization || 'Estudante Independente');
     }
   }, [user, isEditingHeader, isEditingInfo]);
 
@@ -106,6 +108,7 @@ const Profile = () => {
           country: newCountry,
           nickname: newNickname,
           phone: newPhone,
+          organization: newOrganization,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -224,6 +227,10 @@ const Profile = () => {
       setIsSaving(false);
     }
   };
+
+  const formattedDate = user?.email_confirmed_at 
+    ? new Intl.DateTimeFormat('pt-BR', { month: 'short', year: 'numeric' }).format(new Date(user.email_confirmed_at))
+    : 'Out 2023';
 
   return (
     <div className="profile-page">
@@ -377,9 +384,9 @@ const Profile = () => {
             ) : (
               <>
                 <div className="display-name-group" onClick={() => setIsEditingHeader(true)}>
-                  <h1>{user?.nickname || 'Usuário'}</h1>
-                  <div className="edit-trigger visible">
-                    <Edit2 size={18} />
+                  <div className="name-with-icon">
+                    <h1>{user?.nickname || 'Usuário'}</h1>
+                    <Edit2 size={18} className="edit-icon-inline" />
                   </div>
                 </div>
                 <div className="status-badge-row">
@@ -389,7 +396,7 @@ const Profile = () => {
                   </div>
                   <div className="status-pill">
                     <Clock size={14} />
-                    <span>Inscrito em Out 2023</span>
+                    <span>Inscrito em {formattedDate}</span>
                   </div>
                 </div>
               </>
@@ -456,11 +463,48 @@ const Profile = () => {
 
               <div className="info-block">
                 <label>Organização</label>
-                <span className="read-only-text">Estudante Independente</span>
+                {isEditingInfo ? (
+                  <input type="text" value={newOrganization} onChange={(e) => setNewOrganization(e.target.value)} className="info-edit-input" placeholder="Ex: Vies Studios" />
+                ) : (
+                  <span>{user?.organization || 'Estudante Independente'}</span>
+                )}
               </div>
             </div>
           </div>
         </section>
+
+        <section className="profile-col-right">
+          <div className="progress-square glass-card">
+            <h3>Meu Progresso</h3>
+            <div className="empty-state-minimal-v2">
+              <div className="empty-progress-border" />
+              <p className="text-secondary-small">O acompanhamento de progresso das suas trilhas aparecerá aqui assim que você iniciar o primeiro módulo.</p>
+            </div>
+          </div>
+
+          <div className="security-square glass-card">
+            <div className="security-content">
+              <div>
+                <h3>Segurança</h3>
+                <p className="text-secondary-small">Gerencie sua senha e acessos da conta.</p>
+              </div>
+              <button className="btn-secondary-modern" onClick={() => window.location.href='/settings'}>Alterar Senha</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer className="profile-actions-footer">
+        <button className="btn-logout-link" onClick={handleLogout}>
+          <LogOut size={18} />
+          <span>Sair da Conta</span>
+        </button>
+      </footer>
+    </div>
+  );
+};
+
+export default Profile;
 
         <section className="profile-col-right">
           <div className="progress-square glass-card">
