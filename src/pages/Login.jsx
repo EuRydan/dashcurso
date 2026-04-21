@@ -290,8 +290,8 @@ const Login = () => {
                   <div className="otp-modern-wrapper">
                     <input 
                       type="text" 
-                      maxLength="6" 
-                      placeholder="000000" 
+                      maxLength={8} 
+                      placeholder="00000000" 
                       className="otp-field-big"
                       value={regOtp}
                       onChange={(e) => setRegOtp(e.target.value.replace(/\D/g, ''))}
@@ -303,7 +303,7 @@ const Login = () => {
 
                   {error && regStep === 1 && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
 
-                  <button type="submit" className="btn-vies-primary" disabled={loading || regOtp.length < 6}>
+                  <button type="submit" className="btn-vies-primary" disabled={loading || regOtp.length < 8}>
                      {loading ? <Loader2 className="spin" size={20} /> : (
                        <>
                          <span>Finalizar Ativação</span>
