@@ -133,15 +133,30 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const refreshUser = async () => {
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (authUser) await fetchUserProfile(authUser);
+  };
+
   const logout = async () => {
+    console.log('[Logout] Processo de saída iniciado...');
     try {
-      await supabase.auth.signOut();
+      // Tenta deslogar do Supabase, mas não espera mais que 2 segundos
+      await Promise.race([
+        supabase.auth.signOut(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))
+      ]);
     } catch (err) {
-      console.error('Erro no signout:', err);
+      console.warn('[Logout] Alerta: Signout do servidor ignorado ou falhou:', err.message);
     } finally {
+      // Limpeza BRUTA de qualquer rastro local
       localStorage.removeItem(CACHE_KEY);
+      localStorage.clear(); 
       setUser(null);
-      window.location.href = '/login'; 
+      
+      console.log('[Logout] Redirecionando para login...');
+      // Força o redirecionamento total da janela
+      window.location.href = '/login';
     }
   };
 

@@ -10,6 +10,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
   const { user, theme, toggleTheme, logout } = useAppContext();
 
   const handleLogout = () => {
+    console.log('[Sidebar] Botão Sair clicado!');
     logout();
   };
 

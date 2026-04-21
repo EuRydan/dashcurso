@@ -120,6 +120,7 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
+    console.log('[Profile] Botão Sair clicado!');
     logout();
   };
 
