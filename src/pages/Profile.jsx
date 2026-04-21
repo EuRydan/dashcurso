@@ -324,6 +324,7 @@ const Profile = () => {
                       type="text"
                       value={newNickname}
                       onChange={(e) => setNewNickname(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleUpdateProfile('header')}
                       className="header-edit-input"
                       placeholder="Ex: Ryanzin"
                       autoFocus
@@ -339,6 +340,15 @@ const Profile = () => {
                         onChange={(e) => {
                           setStatusSearch(e.target.value);
                           if (!showStatusDropdown) setShowStatusDropdown(true);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            if (showStatusDropdown && filteredCategories.length > 0) {
+                              setNewStatus(filteredCategories[0]);
+                              setShowStatusDropdown(false);
+                            }
+                            handleUpdateProfile('header');
+                          }
                         }}
                         onFocus={() => {
                           setShowStatusDropdown(true);
@@ -435,7 +445,14 @@ const Profile = () => {
               <div className="info-block">
                 <label>Nome Completo</label>
                 {isEditingInfo ? (
-                  <input type="text" value={newFullName} onChange={(e) => setNewFullName(e.target.value)} className="info-edit-input" placeholder="Seu nome real" />
+                  <input 
+                    type="text" 
+                    value={newFullName} 
+                    onChange={(e) => setNewFullName(e.target.value)} 
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdateProfile('info')}
+                    className="info-edit-input" 
+                    placeholder="Seu nome real" 
+                  />
                 ) : (
                   <span>{user?.full_name || 'Não informado'}</span>
                 )}
@@ -454,7 +471,14 @@ const Profile = () => {
               <div className="info-block">
                 <label>Telefone</label>
                 {isEditingInfo ? (
-                  <input type="text" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} className="info-edit-input" placeholder="+55 (00) 00000-0000" />
+                  <input 
+                    type="text" 
+                    value={newPhone} 
+                    onChange={(e) => setNewPhone(e.target.value)} 
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdateProfile('info')}
+                    className="info-edit-input" 
+                    placeholder="+55 (00) 00000-0000" 
+                  />
                 ) : (
                   <span>{user?.phone || '+55 (00) 00000-0000'}</span>
                 )}
@@ -463,7 +487,14 @@ const Profile = () => {
               <div className="info-block">
                 <label>País / Região</label>
                 {isEditingInfo ? (
-                  <input type="text" value={newCountry} onChange={(e) => setNewCountry(e.target.value)} className="info-edit-input" placeholder="Brasil" />
+                  <input 
+                    type="text" 
+                    value={newCountry} 
+                    onChange={(e) => setNewCountry(e.target.value)} 
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdateProfile('info')}
+                    className="info-edit-input" 
+                    placeholder="Brasil" 
+                  />
                 ) : (
                   <span>{user?.country || 'Brasil'}</span>
                 )}
@@ -472,7 +503,14 @@ const Profile = () => {
               <div className="info-block">
                 <label>Organização</label>
                 {isEditingInfo ? (
-                  <input type="text" value={newOrganization} onChange={(e) => setNewOrganization(e.target.value)} className="info-edit-input" placeholder="Ex: Vies Studios" />
+                  <input 
+                    type="text" 
+                    value={newOrganization} 
+                    onChange={(e) => setNewOrganization(e.target.value)} 
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdateProfile('info')}
+                    className="info-edit-input" 
+                    placeholder="Ex: Vies Studios" 
+                  />
                 ) : (
                   <span>{user?.organization || 'Estudante Independente'}</span>
                 )}
