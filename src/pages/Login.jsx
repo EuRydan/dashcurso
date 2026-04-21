@@ -131,12 +131,18 @@ const Login = () => {
         )
       ]);
 
-      if (otpError) throw new Error('Erro ao enviar código. Verifique se o e-mail está correto.');
+      if (otpError) {
+        // Se o erro for "email rate limit exceeded", avisar amigavelmente
+        if (otpError.message.includes('rate limit')) {
+          throw new Error('Limite de envios atingido. Aguarde 60 segundos antes de tentar novamente.');
+        }
+        throw new Error(otpError.message);
+      }
       
       setLoginStep(1);
       setResendTimer(60);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Erro inesperado ao enviar código.');
     } finally {
       setLoading(false);
     }
