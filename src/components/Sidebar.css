@@ -29,6 +29,15 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+  cursor: pointer;
+}
+
+.profile-card:hover {
+  background-color: var(--color-bg-active);
+  border-color: var(--color-primary-soft);
+  transform: translateY(-2px);
 }
 
 .avatar {

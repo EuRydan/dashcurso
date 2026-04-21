@@ -21,13 +21,13 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
     <aside className={`sidebar ${isOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-top">
         <div className="profile-section">
-          <div className="profile-card">
+          <NavLink to="/profile" className="profile-card" onClick={closeSidebar}>
             <img src={avatarUrl} alt="Avatar" className="avatar" />
             <div className="profile-info">
               <span className="profile-name">{displayName}</span>
               <span className="profile-status">Deep Work Mode</span>
             </div>
-          </div>
+          </NavLink>
         </div>
 
         <nav className="nav-menu">
