@@ -80,20 +80,13 @@ const Profile = () => {
         }
       }
 
-      console.log('[Profile] Upsert concluído. Atualizando dados globais...');
+      console.log('[Profile] Upsert concluído. Atualizando dados globais em background...');
       
-      // 2. Executa o refreshUser com timeout de 5 segundos
+      // 2. Dispara o refresh em background sem bloquear a UI
       if (refreshUser) {
-        try {
-          await Promise.race([
-            refreshUser(),
-            new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('refreshUser timeout (5s)')), 5000)
-            )
-          ]);
-        } catch (refreshErr) {
-          console.warn('[Profile] refreshUser falhou ou demorou demais:', refreshErr.message);
-        }
+        refreshUser().catch(err => 
+          console.warn('[Profile] refreshUser em background falhou:', err.message)
+        );
       }
       
       if (target === 'header') setIsEditingHeader(false);
