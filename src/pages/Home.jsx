@@ -5,7 +5,7 @@ import './Home.css';
 
 const Home = () => {
   const { user } = useAppContext();
-  const firstName = user?.name ? user.name.split(' ')[0] : 'Alex';
+  const firstName = user?.nickname || 'Usuário';
   
   // Sistema cru: sem dados iniciais
   const continueWatching = [];
