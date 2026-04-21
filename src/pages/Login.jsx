@@ -95,15 +95,28 @@ const Login = () => {
     if (error) { setError(error.message); setLoading(false); }
   };
 
+  const handleVisitorLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ 
+        email: 'visitante@lumen.com.br', 
+        password: 'lumen123' 
+      });
+      if (error) {
+        setError('Acesso de visitante indisponível. Credenciais: visitante@lumen.com.br / lumen123');
+        setLoading(false);
+      } else {
+        navigate('/');
+      }
+    } catch (err) {
+      setError('Erro ao tentar acessar como visitante.');
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="auth-master-container">
-      {/* Aurora Background Effects */}
-      <div className="aurora-bg">
-        <div className="aurora-element aurora-1"></div>
-        <div className="aurora-element aurora-2"></div>
-        <div className="aurora-element aurora-3"></div>
-      </div>
-
       <div className={`auth-card-wrapper ${isLogin ? 'is-login' : 'is-register'}`}>
         <div className="auth-card">
           
@@ -167,9 +180,17 @@ const Login = () => {
                 <button type="submit" className="btn-main" disabled={loading}>
                   {loading ? <div className="spinner-small"></div> : 'Acessar'}
                 </button>
+                
                 <button type="button" className="btn-ghost" onClick={handleMagicLinkRequest} disabled={loading}>
                   <Wand2 size={16}/> Link Mágico por E-mail
                 </button>
+
+                <div className="auth-divider"><span>ou para testes</span></div>
+                
+                <button type="button" className="btn-visitor" onClick={handleVisitorLogin} disabled={loading}>
+                   <ShieldCheck size={18} /> Entrar como Visitante
+                </button>
+
                 <div className="auth-footer">
                   Novo por aqui? <button type="button" onClick={toggleMode}>Crie sua conta</button>
                 </div>
