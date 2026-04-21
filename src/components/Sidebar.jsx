@@ -25,7 +25,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
             <img src={avatarUrl} alt="Avatar" className="avatar" />
             <div className="profile-info">
               <span className="profile-name">{displayName}</span>
-              <span className="profile-status">Deep Work Mode</span>
+              <span className="profile-status">{user?.status || 'Estudante'}</span>
             </div>
           </NavLink>
         </div>
