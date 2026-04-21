@@ -1,17 +1,55 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Edit2, Loader2, LogOut, Milestone, Clock, Mail, Save, X, Shield, CheckCircle2 } from 'lucide-react';
 import { useAppContext } from '../components/AppContext';
 import { supabase } from '../lib/supabase';
 import './Profile.css';
 
+const PRESET_CATEGORIES = [
+  'Estudante',
+  'Designer Gráfico',
+  'Designer UI/UX',
+  'Web Designer',
+  'Motion Designer',
+  'Desenvolvedor Front-end',
+  'Desenvolvedor Back-end',
+  'Desenvolvedor Full-stack',
+  'Desenvolvedor Mobile',
+  'Engenheiro de Software',
+  'Arquiteto de Software',
+  'DevOps Engineer',
+  'Social Media',
+  'Copywriter',
+  'Gestor de Tráfego',
+  'Analista de SEO',
+  'Marketing Digital',
+  'Editor de Vídeo',
+  'Filmmaker',
+  'Fotógrafo',
+  'Ilustrador',
+  'Empreendedor',
+  'Freelancer',
+  'Consultor',
+  'Publicitário',
+  'Jornalista',
+  'Relações Públicas',
+  'Data Scientist',
+  'Analista de Dados',
+  'Product Manager',
+  'Community Manager',
+  'Assistente Virtual'
+].sort();
+
 const Profile = () => {
   const navigate = useNavigate();
   const { user, refreshUser, logout } = useAppContext();
   const fileInputRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   const [isEditingHeader, setIsEditingHeader] = useState(false);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [statusSearch, setStatusSearch] = useState('');
 
   const [newNickname, setNewNickname] = useState(user?.nickname || '');
   const [newFullName, setNewFullName] = useState(user?.full_name || '');
@@ -20,6 +58,22 @@ const Profile = () => {
   const [newPhone, setNewPhone] = useState(user?.phone || '');
 
   const [isSaving, setIsSaving] = useState(false);
+
+  // Fecha dropdown ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowStatusDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filtro de categorias
+  const filteredCategories = PRESET_CATEGORIES.filter(cat => 
+    cat.toLowerCase().includes(statusSearch.toLowerCase())
+  );
 
   // Sincroniza estados locais quando dados globais mudam (após refresh)
   React.useEffect(() => {
@@ -41,6 +95,7 @@ const Profile = () => {
   const handleUpdateProfile = async (target) => {
     console.log('[Profile] Iniciando salvamento:', target);
     setIsSaving(true);
+    setShowStatusDropdown(false);
 
     try {
       const { error } = await supabase
@@ -259,23 +314,61 @@ const Profile = () => {
                       autoFocus
                     />
                   </div>
-                  <div className="header-input-group">
+                  
+                  <div className="header-input-group" ref={dropdownRef}>
                     <label>Status</label>
-                    <input
-                      type="text"
-                      value={newStatus}
-                      onChange={(e) => setNewStatus(e.target.value)}
-                      className="header-edit-input"
-                      placeholder="Ex: Estudante"
-                    />
+                    <div className="searchable-select-container">
+                      <input
+                        type="text"
+                        value={showStatusDropdown ? statusSearch : newStatus}
+                        onChange={(e) => {
+                          setStatusSearch(e.target.value);
+                          if (!showStatusDropdown) setShowStatusDropdown(true);
+                        }}
+                        onFocus={() => {
+                          setShowStatusDropdown(true);
+                          setStatusSearch('');
+                        }}
+                        className="header-edit-input"
+                        placeholder="Pesquisar categoria..."
+                      />
+                      
+                      {showStatusDropdown && (
+                        <div className="categories-dropdown glass-card">
+                          <div className="categories-list">
+                            {filteredCategories.length > 0 ? (
+                              filteredCategories.map(cat => (
+                                <div 
+                                  key={cat} 
+                                  className={`category-item ${newStatus === cat ? 'active' : ''}`}
+                                  onClick={() => {
+                                    setNewStatus(cat);
+                                    setShowStatusDropdown(false);
+                                  }}
+                                >
+                                  {cat}
+                                  {newStatus === cat && <CheckCircle2 size={14} />}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="no-results">Nenhuma profissão encontrada.</div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
+                
                 <div className="header-edit-actions">
                   <button className="btn-save-minimal" onClick={() => handleUpdateProfile('header')} disabled={isSaving}>
                     {isSaving ? <Loader2 className="spin" size={16} /> : <Save size={16} />}
                     <span>Salvar</span>
                   </button>
-                  <button className="btn-cancel-minimal" onClick={() => setIsEditingHeader(false)}>
+                  <button className="btn-cancel-minimal" onClick={() => {
+                    setIsEditingHeader(false);
+                    setShowStatusDropdown(false);
+                  }}>
                     <X size={16} />
                     <span>Cancelar</span>
                   </button>
@@ -290,7 +383,7 @@ const Profile = () => {
                   </div>
                 </div>
                 <div className="status-badge-row">
-                  <div className="status-pill text-primary">
+                  <div className="status-pill tag-mode">
                     <Milestone size={14} />
                     <span>{user?.status || 'Estudante'}</span>
                   </div>
