@@ -17,12 +17,13 @@ const Login = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
 
-  // Login States
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loginStep, setLoginStep] = useState(0); // 0: Credenciais, 1: OTP
+  const [loginOtp, setLoginOtp] = useState('');
 
   // Registration States
   const [regStep, setRegStep] = useState(0);
@@ -106,6 +107,65 @@ const Login = () => {
     } finally {
       setLoading(false);
       console.log('[Login] Fluxo finalizado.');
+    }
+  };
+
+  const handleSendOtpLogin = async () => {
+    if (!email) {
+      setError('Insira seu e-mail para receber o código.');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      console.log('[Login] Solicitando OTP para login...');
+      const { error: otpError } = await Promise.race([
+        supabase.auth.signInWithOtp({ 
+          email,
+          options: {
+            shouldCreateUser: false // Só permite login para quem já tem conta
+          }
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Tempo de resposta excedido.')), 8000)
+        )
+      ]);
+
+      if (otpError) throw new Error('Erro ao enviar código. Verifique se o e-mail está correto.');
+      
+      setLoginStep(1);
+      setResendTimer(60);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtpLogin = async (e) => {
+    if (e) e.preventDefault();
+    if (loginOtp.length < 6) return;
+
+    setError('');
+    setLoading(true);
+    try {
+      const { error: verifyError } = await Promise.race([
+        supabase.auth.verifyOtp({
+          email,
+          token: loginOtp,
+          type: 'magiclink'
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Tempo de resposta excedido.')), 8000)
+        )
+      ]);
+
+      if (verifyError) throw new Error('Código inválido ou expirado.');
+      navigate('/');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -255,57 +315,101 @@ const Login = () => {
             </header>
 
             <div className="form-body">
-              <button className="btn-social-outline" onClick={handleGoogleLogin} disabled={loading}>
-                <GoogleIcon />
-                <span>Google</span>
-              </button>
-
-              <div className="section-divider"><span>ou use seu e-mail</span></div>
-
-              <form onSubmit={(e) => handleValidationSubmit(e, true)} className="main-form">
-                <div className="field-modern">
-                  <Mail size={18} className="field-icon-left" />
-                  <input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                </div>
-
-                <div className="field-modern">
-                  <Lock size={18} className="field-icon-left" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <button type="button" className="field-icon-right" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              {loginStep === 0 ? (
+                <>
+                  <button className="btn-social-outline" onClick={handleGoogleLogin} disabled={loading}>
+                    <GoogleIcon />
+                    <span>Google</span>
                   </button>
-                </div>
 
-                <div className="form-links">
-                  <a href="#reset" className="link-subtle">Esqueceu a senha?</a>
-                </div>
+                  <div className="section-divider"><span>ou use seu e-mail</span></div>
 
-                {error && isLogin && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
+                  <form onSubmit={(e) => handleValidationSubmit(e, true)} className="main-form">
+                    <div className="field-modern">
+                      <Mail size={18} className="field-icon-left" />
+                      <input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                    </div>
 
-                <button type="submit" className="btn-vies-primary" disabled={loading}>
-                  {loading ? <Loader2 className="spin" size={20} /> : (
-                    <>
-                      <span>Acessar</span>
-                      <ArrowRight size={18} />
-                    </>
-                  )}
-                </button>
+                    <div className="field-modern">
+                      <Lock size={18} className="field-icon-left" />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Senha"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <button type="button" className="field-icon-right" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
 
-                <div className="alternative-entry">
-                  <button type="button" className="btn-magic" disabled={loading}>
-                    <Wand2 size={16} /> Link Mágico
+                    <div className="form-links">
+                      <a href="#reset" className="link-subtle">Esqueceu a senha?</a>
+                    </div>
+
+                    {error && isLogin && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
+
+                    <button type="submit" className="btn-vies-primary" disabled={loading}>
+                      {loading ? <Loader2 className="spin" size={20} /> : (
+                        <>
+                          <span>Acessar</span>
+                          <ArrowRight size={18} />
+                        </>
+                      )}
+                    </button>
+
+                    <div className="alternative-entry">
+                      <button type="button" className="btn-magic" onClick={handleSendOtpLogin} disabled={loading}>
+                        <Wand2 size={16} /> Link Mágico
+                      </button>
+                      <button type="button" className="btn-visitor-new" onClick={handleVisitorLogin} disabled={loading}>
+                        <ShieldCheck size={16} /> Ver Demo
+                      </button>
+                    </div>
+                  </form>
+                </>
+              ) : (
+                <form onSubmit={handleVerifyOtpLogin} className="main-form">
+                  <div className="otp-modern-wrapper">
+                    <p className="otp-info-text text-center mb-4">Insira o código de 6 dígitos enviado para <strong>{email}</strong></p>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      placeholder="000000"
+                      className="otp-field-big"
+                      value={loginOtp}
+                      onChange={(e) => setLoginOtp(e.target.value.replace(/\D/g, ''))}
+                      disabled={loading}
+                      autoFocus
+                    />
+                    
+                    <div className="otp-actions-row">
+                      <p className="otp-hint">Não recebeu?</p>
+                      <button
+                        type="button"
+                        className="btn-resend"
+                        disabled={resendTimer > 0 || loading}
+                        onClick={handleSendOtpLogin}
+                      >
+                        {resendTimer > 0 ? `Reenviar em ${resendTimer}s` : 'Reenviar código'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {error && isLogin && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
+
+                  <button type="submit" className="btn-vies-primary" disabled={loading || loginOtp.length < 6}>
+                    {loading ? <Loader2 className="spin" size={20} /> : (
+                      <>
+                        <span>Verificar e Entrar</span>
+                        <CheckCircle2 size={18} />
+                      </>
+                    )}
                   </button>
-                  <button type="button" className="btn-visitor-new" onClick={handleVisitorLogin} disabled={loading}>
-                    <ShieldCheck size={16} /> Ver Demo
-                  </button>
-                </div>
-              </form>
+                  <button type="button" className="btn-link-subtle w-full mt-4" onClick={() => setLoginStep(0)}>Usar senha</button>
+                </form>
+              )}
             </div>
 
             <footer className="form-footer">
