@@ -1,5 +1,11 @@
 /* src/pages/Login.css */
 
+:root {
+  --vies-primary: #a3e635;
+  --vies-accent: #3b82f6;
+  --vies-bg: #0c0c0b;
+}
+
 .auth-master-container {
   width: 100vw;
   min-height: 100vh;
@@ -180,7 +186,7 @@
 
 /* --- Primary Button --- */
 .btn-primary-new {
-  background: var(--lumen-primary);
+  background: var(--vies-primary);
   color: #000;
   border: none;
   border-radius: 16px;
@@ -238,7 +244,7 @@
 
 .btn-subtle.visitor {
   border: 1px dashed rgba(163, 230, 53, 0.3);
-  color: var(--lumen-primary);
+  color: var(--vies-primary);
 }
 
 .btn-subtle.visitor:hover {

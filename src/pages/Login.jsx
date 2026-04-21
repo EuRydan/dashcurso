@@ -95,9 +95,8 @@ const Login = () => {
       <div className="auth-card-wrapper">
         <div className="auth-card glass-premium">
           <header className="auth-header-new">
-             <div className="logo-placeholder">L</div>
              <h1>{isLogin ? (isMagicFlow ? 'Validar Acesso' : 'Bem-vindo') : 'Criar Conta'}<span className="dot">.</span></h1>
-             <p>{isLogin ? 'Inicie sua jornada na plataforma Lumen' : 'Preencha os dados para começar'}</p>
+             <p>{isLogin ? 'Inicie sua jornada na plataforma Vies Experience' : 'Preencha os dados para começar'}</p>
           </header>
 
           <div className="auth-content-flow">
