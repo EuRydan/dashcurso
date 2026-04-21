@@ -19,6 +19,18 @@ const Profile = () => {
   const [newPhone, setNewPhone] = useState(user?.phone || '');
   
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Sync LOCAL states with GLOBAL context when user data changes (after refresh)
+  React.useEffect(() => {
+    if (!isEditingHeader && !isEditingInfo) {
+      setNewNickname(user?.nickname || '');
+      setNewFullName(user?.full_name || '');
+      setNewStatus(user?.status || 'Estudante');
+      setNewCountry(user?.country || 'Brasil');
+      setNewPhone(user?.phone || '');
+    }
+  }, [user, isEditingHeader, isEditingInfo]);
 
   // Email Change State
   const [emailModalStep, setEmailModalStep] = useState(0); 
@@ -27,32 +39,31 @@ const Profile = () => {
   const [emailError, setEmailError] = useState('');
 
   const handleUpdateProfile = async (target) => {
-    console.log('Iniciando handleUpdateProfile para:', target);
+    console.log('[Profile] Iniciando salvamento:', target);
     setIsSaving(true);
     try {
-      // Usamos apenas as colunas que TEMOS CERTEZA que existem inicialmente
-      // Se nickname e phone falharem, tentamos apenas com full_name e status
       const updateData = { 
         id: user.id, 
         full_name: newFullName,
         status: newStatus,
         country: newCountry,
-        nickname: newNickname, // Tentamos enviar
-        phone: newPhone,       // Tentamos enviar
+        nickname: newNickname, 
+        phone: newPhone,       
         updated_at: new Date().toISOString()
       };
 
-      console.log('Update Data:', updateData);
+      console.log('[Profile] Enviando dados via upsert:', updateData);
 
       const { error } = await supabase
         .from('profiles')
         .upsert(updateData);
 
       if (error) {
-        console.error('Supabase Upsert Error:', error);
-        // Fallback para colunas seguras se nickname/phone falharem
-        if (error.message.includes('column "nickname"') || error.message.includes('column "phone"')) {
-           console.log('Tentando fallback sem colunas novas...');
+        console.error('[Profile] Erro no Upsert:', error);
+        
+        // Fallback imediato se as colunas novas (nickname/phone) não existirem
+        if (error.message?.includes('column')) {
+           console.log('[Profile] Tentando fallback seguro...');
            const { error: error2 } = await supabase
              .from('profiles')
              .upsert({
@@ -68,20 +79,22 @@ const Profile = () => {
         }
       }
 
-      console.log('Upsert concluído com sucesso. Atualizando contexto...');
+      console.log('[Profile] Upsert concluído. Atualizando dados globais...');
       
-      // Não damos await no refreshUser para não travar a UI se a rede estiver lenta
-      refreshUser().catch(err => console.error('Error refreshing user:', err));
+      // Sincroniza o contexto global
+      if (refreshUser) {
+        await refreshUser();
+      }
       
       if (target === 'header') setIsEditingHeader(false);
       if (target === 'info') setIsEditingInfo(false);
       
     } catch (err) {
-      console.error('Final Catch Error:', err);
-      alert('Erro ao salvar: ' + (err.message || 'Verifique sua conexão.'));
+      console.error('[Profile] Erro fatal ao salvar:', err);
+      alert('Ops! Não conseguimos salvar agora: ' + (err.message || 'Erro de conexão/banco.'));
     } finally {
       setIsSaving(false);
-      console.log('Status de salvamento encerrado.');
+      console.log('[Profile] Ciclo de salvamento finalizado.');
     }
   };
 

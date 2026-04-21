@@ -14,7 +14,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
     navigate('/login');
   };
 
-  const displayName = user?.name || user?.email?.split('@')[0] || 'Alex Rivers';
+  const displayName = user?.nickname || user?.full_name || user?.name || user?.email?.split('@')[0] || 'Usuário';
   const avatarUrl = user?.avatarBase64 || `https://ui-avatars.com/api/?name=${displayName.replace(' ', '+')}&background=353534&color=A3E635&size=128`;
 
   return (
