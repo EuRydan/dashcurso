@@ -6,19 +6,25 @@ const AppContext = createContext();
 
 export const useAppContext = () => useContext(AppContext);
 
+const CACHE_KEY = 'sb-profile-cache';
+
 export const AppProvider = ({ children }) => {
-  // Theme State
+  // Theme State (Always dark as per user preference)
   const [theme] = useState('dark');
   
-  // User State
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // User State - Try to hydrate from localStorage first
+  const [user, setUser] = useState(() => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+  
+  // If we have cached user, we can set loading to false immediately
+  const [loading, setLoading] = useState(!localStorage.getItem(CACHE_KEY));
 
-  console.log('--- AppContext Debug ---');
-  console.log('SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL ? 'DEFINIDO' : 'AUSENTE');
-  console.log('SUPABASE_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? 'DEFINIDO' : 'AUSENTE');
-
-  // Update DOM Theme & Persistence
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'dark');
   }, []);
@@ -27,33 +33,37 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     let isMounted = true;
 
-    // Timeout de segurança: se o banco demorar mais de 6s, libera a tela
+    // Reduzido para 3s para uma experiência mais ágil em caso de erro
     const safetyTimeout = setTimeout(() => {
       if (isMounted) setLoading(false);
-    }, 6000);
+    }, 3000);
 
     const initializeAuth = async () => {
       try {
-        // 1. Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
         
         if (session && isMounted) {
-          // IMPORTANT: Set basic user info immediately so AuthGuard doesn't redirect
           const authUser = session.user;
-          setUser({
+          const basicUser = {
             id: authUser.id,
             email: authUser.email,
             nickname: authUser.user_metadata?.nickname || authUser.user_metadata?.full_name?.split(' ')[0] || authUser.email.split('@')[0],
             full_name: authUser.user_metadata?.full_name || '',
             avatarBase64: authUser.user_metadata?.avatar_url || null,
             email_confirmed_at: authUser.email_confirmed_at
-          });
+          };
+
+          // Update state with basic info immediately to unlock UI
+          setUser(prev => ({ ...prev, ...basicUser }));
+          setLoading(false); // UI becomes interactive here!
           
-          // 2. Fetch profile in background to enrich
+          // Enrich in background
           await fetchUserProfile(authUser);
         } else if (isMounted) {
           setLoading(false);
+          setUser(null);
+          localStorage.removeItem(CACHE_KEY);
         }
       } catch (err) {
         console.error('Erro na inicialização de Auth:', err);
@@ -63,12 +73,9 @@ export const AppProvider = ({ children }) => {
 
     initializeAuth();
 
-    // 3. Listen for changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Evento de Auth:', event);
       if (session && isMounted) {
         const authUser = session.user;
-        // Update user state immediately on sign in/refresh
         setUser(prev => ({
           ...prev,
           id: authUser.id,
@@ -81,6 +88,7 @@ export const AppProvider = ({ children }) => {
       } else if (event === 'SIGNED_OUT' && isMounted) {
         setUser(null);
         setLoading(false);
+        localStorage.removeItem(CACHE_KEY);
       }
     });
 
@@ -101,7 +109,7 @@ export const AppProvider = ({ children }) => {
       
       if (error && error.code !== 'PGRST116') throw error;
 
-      setUser({
+      const profileData = {
         id: authUser.id,
         email: authUser.email,
         nickname: data?.nickname || authUser.user_metadata?.nickname || authUser.email.split('@')[0],
@@ -111,7 +119,13 @@ export const AppProvider = ({ children }) => {
         country: data?.country || 'Brasil',
         phone: data?.phone || '',
         email_confirmed_at: authUser.email_confirmed_at
-      });
+      };
+
+      setUser(profileData);
+      
+      // PERSISTÊNCIA: Salva no localStorage para a próxima carga instantânea
+      localStorage.setItem(CACHE_KEY, JSON.stringify(profileData));
+      
     } catch (err) {
       console.error('Error fetching profile enrichment:', err);
     } finally {
@@ -124,14 +138,10 @@ export const AppProvider = ({ children }) => {
     if (authUser) await fetchUserProfile(authUser);
   };
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-  };
-
   return (
     <AppContext.Provider value={{
       theme: 'dark',
-      toggleTheme: () => {}, // Disable toggle
+      toggleTheme: () => {},
       user,
       refreshUser,
       loading
