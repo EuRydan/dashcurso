@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Edit2, Shield, Lock, ExternalLink, Save, X, Loader2 } from 'lucide-react';
+import { Camera, Edit2, Shield, Lock, ExternalLink, Save, X, Loader2, LogOut, Milestone, Award, Clock } from 'lucide-react';
 import { useAppContext } from '../components/AppContext';
 import { supabase } from '../lib/supabase';
 import './Profile.css';
@@ -47,7 +47,6 @@ const Profile = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Pre-check size (e.g. 2MB max for Base64 to avoid DB limits)
     if (file.size > 2 * 1024 * 1024) {
       alert('A imagem é muito grande. Escolha uma imagem de até 2MB.');
       return;
@@ -56,7 +55,6 @@ const Profile = () => {
     setIsSaving(true);
 
     try {
-      // Use standard FileReader with a Promise for cleaner async flow
       const base64String = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
@@ -73,8 +71,6 @@ const Profile = () => {
         });
 
       if (error) throw error;
-      
-      // Update local context
       await refreshUser();
     } catch (err) {
       console.error('Error updating avatar:', err);
@@ -84,9 +80,14 @@ const Profile = () => {
     }
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = '/login';
+  };
+
   return (
     <div className="profile-page">
-      <header className="profile-hero glass-card">
+      <header className="profile-hero-modern">
         <div className="hero-content">
           <div className="avatar-big-wrapper" onClick={handleAvatarClick}>
             <img src={user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.name?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`} alt="Profile" />
@@ -112,10 +113,6 @@ const Profile = () => {
                     className="modern-edit-input"
                     placeholder="Nome"
                     autoFocus
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleUpdateProfile();
-                      if (e.key === 'Escape') setIsEditing(false);
-                    }}
                   />
                   <div className="edit-actions">
                     <button className="btn-save-glow" onClick={handleUpdateProfile} disabled={isSaving}>
@@ -135,24 +132,39 @@ const Profile = () => {
                 />
               </div>
             ) : (
-              <div className="display-name-group" onClick={() => setIsEditing(true)}>
-                <h1>{user?.name || 'Alex Rivers'}</h1>
-                <div className="edit-trigger visible">
-                  <Edit2 size={18} />
+              <>
+                <div className="display-name-group" onClick={() => setIsEditing(true)}>
+                  <h1>{user?.name || 'Alex Rivers'}</h1>
+                  <div className="edit-trigger visible">
+                    <Edit2 size={18} />
+                  </div>
                 </div>
-              </div>
+                <div className="status-badge-row">
+                   <div className="status-pill text-primary">
+                      <Milestone size={14} />
+                      <span>{user?.status || 'Estudante'}</span>
+                   </div>
+                   <div className="status-pill">
+                      <Clock size={14} />
+                      <span>Inscrito em Out 2023</span>
+                   </div>
+                </div>
+              </>
             )}
-            {!isEditing && <p className="status-label">{user?.status || 'Estudante'} • Desde 2026</p>}
           </div>
         </div>
       </header>
 
-      <div className="profile-layout">
-        <section className="profile-main">
-          <div className="personal-info glass-card">
-            <h3>Informações Pessoais</h3>
-            <div className="info-grid">
-              <div className="info-field">
+      <div className="profile-grid-layout">
+        <section className="profile-col-left">
+          <div className="personal-info-square glass-card">
+            <div className="card-title-row">
+              <h3>Informações Pessoais</h3>
+              {!isEditing && <Edit2 size={18} className="icon-btn-subtle" onClick={() => setIsEditing(true)} />}
+            </div>
+            
+            <div className="info-stack">
+              <div className="info-block">
                 <label>Nome Completo</label>
                 {isEditing ? (
                   <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} className="info-edit-input" />
@@ -160,54 +172,79 @@ const Profile = () => {
                   <span>{user?.name || 'Não informado'}</span>
                 )}
               </div>
-              <div className="info-field">
+              <div className="info-block">
                 <label>Endereço de E-mail</label>
-                <span className="read-only-email">{user?.email}</span>
+                <span className="read-only-text">{user?.email}</span>
               </div>
-              <div className="info-field">
-                <label>País / Região</label>
-                {isEditing ? (
-                  <input type="text" value={newCountry} onChange={(e) => setNewCountry(e.target.value)} className="info-edit-input" />
-                ) : (
-                  <span>{user?.country || 'Brasil'}</span>
-                )}
+              <div className="info-block">
+                <label>Telefone</label>
+                <span className="read-only-text">+55 (00) 00000-0000</span>
+              </div>
+              <div className="info-block">
+                <label>Organização</label>
+                <span className="read-only-text">Estudante Independente</span>
               </div>
             </div>
-            {!isEditing ? (
-              <button className="btn-secondary" onClick={() => setIsEditing(true)}>Editar Detalhes</button>
-            ) : (
-              <button className="btn-primary-mini" onClick={handleUpdateProfile} disabled={isSaving}>
-                {isSaving ? 'Salvando...' : 'Salvar Alterações'}
-              </button>
-            )}
-          </div>
-
-          <div className="security-box glass-card">
-            <div className="security-text">
-              <h3>Segurança</h3>
-              <p className="text-secondary">Gerencie sua senha e acessos da conta.</p>
-            </div>
-            <button className="btn-secondary" onClick={() => window.location.href='/settings'}>Alterar Senha</button>
           </div>
         </section>
 
-        <aside className="profile-sidebar">
-          <div className="progress-card glass-card shadow-neon">
+        <section className="profile-col-right">
+          <div className="progress-square glass-card">
             <h3>Meu Progresso</h3>
-            <div className="stats-row">
-              <div className="stat-item">
-                <span className="stat-value">0%</span>
-                <span className="stat-label">Progresso Geral</span>
+            <div className="nested-progress-list">
+              <div className="nested-item">
+                <div className="nested-header">
+                   <span>UI/UX Avançado</span>
+                   <span className="progress-badge">Em Progresso</span>
+                </div>
+                <div className="nested-bar-bg">
+                   <div className="nested-bar-fill" style={{ width: '65%' }} />
+                </div>
+                <span className="nested-label">65% Concluído</span>
               </div>
-              <div className="stat-item">
-                <span className="stat-value">0h</span>
-                <span className="stat-label">Tempo Investido</span>
+
+              <div className="nested-item">
+                <div className="nested-header">
+                   <span>Motion Design</span>
+                   <span className="progress-badge">Em Progresso</span>
+                </div>
+                <div className="nested-bar-bg">
+                   <div className="nested-bar-fill" style={{ width: '20%' }} />
+                </div>
+                <span className="nested-label">20% Concluído</span>
+              </div>
+
+              <div className="nested-item">
+                <div className="nested-header">
+                   <span>Fundamentos</span>
+                   <span className="progress-badge completed">Concluído</span>
+                </div>
+                <div className="nested-bar-bg">
+                   <div className="nested-bar-fill done" style={{ width: '100%' }} />
+                </div>
+                <span className="nested-label">100% Concluído</span>
               </div>
             </div>
-            <button className="btn-primary" onClick={() => window.location.href='/courses'}>Começar a Estudar</button>
           </div>
-        </aside>
+
+          <div className="security-square glass-card">
+            <div className="security-content">
+              <div>
+                <h3>Segurança</h3>
+                <p className="text-secondary-small">Gerencie sua senha e acessos da conta.</p>
+              </div>
+              <button className="btn-secondary-modern" onClick={() => window.location.href='/settings'}>Alterar Senha</button>
+            </div>
+          </div>
+        </section>
       </div>
+
+      <footer className="profile-actions-footer">
+         <button className="btn-logout-link" onClick={handleLogout}>
+            <LogOut size={18} />
+            <span>Sair da Conta</span>
+         </button>
+      </footer>
     </div>
   );
 };

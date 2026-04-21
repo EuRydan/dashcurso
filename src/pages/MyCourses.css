@@ -53,6 +53,12 @@
   width: 100%;
 }
 
+.course-layout.empty {
+  grid-template-columns: 1fr;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 @media (max-width: 1024px) {
   .course-layout {
     grid-template-columns: 1fr;

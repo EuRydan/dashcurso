@@ -11,11 +11,6 @@ const Certificates = () => {
 
   return (
     <div className="certificates-page">
-      <div className="ambient-blurs">
-        <div className="blur-one" />
-        <div className="blur-two" />
-      </div>
-
       <header className="achievement-section glass-card">
         <div className="achievement-content">
           <div className="achievement-text">

@@ -19,7 +19,7 @@ const MyCourses = () => {
         </div>
       </section>
 
-      <div className="course-layout">
+      <div className={`course-layout ${playlist.length === 0 ? 'empty' : ''}`}>
         <div className="course-main">
           {playlist.length > 0 ? (
             <>
@@ -57,11 +57,11 @@ const MyCourses = () => {
           )}
         </div>
 
-        <aside className="course-sidebar">
-          <h3>Playlist do Módulo</h3>
-          <div className="playlist-list">
-            {playlist.length > 0 ? (
-              playlist.map((item, i) => (
+        {playlist.length > 0 && (
+          <aside className="course-sidebar">
+            <h3>Playlist do Módulo</h3>
+            <div className="playlist-list">
+              {playlist.map((item, i) => (
                 <div key={i} className={`playlist-item glass-card ${item.playing ? 'playing' : ''} ${item.locked ? 'locked' : ''}`}>
                   <div className="item-status">
                     {item.locked ? <Lock size={16} /> : (item.completed ? <div className="dot-done" /> : <div className="dot-progress" />)}
@@ -71,12 +71,10 @@ const MyCourses = () => {
                     <span>{item.duration}</span>
                   </div>
                 </div>
-              ))
-            ) : (
-              <p className="text-secondary" style={{ fontSize: '14px', marginTop: '12px' }}>Lista vazia.</p>
-            )}
-          </div>
-        </aside>
+              ))}
+            </div>
+          </aside>
+        )}
       </div>
     </div>
   );
