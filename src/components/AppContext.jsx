@@ -126,6 +126,7 @@ export const AppProvider = ({ children }) => {
         status: data?.status || 'Estudante',
         country: data?.country || 'Brasil',
         phone: data?.phone || '',
+        organization: data?.organization || 'Estudante Independente',
         email_confirmed_at: authUser.email_confirmed_at
       };
 
