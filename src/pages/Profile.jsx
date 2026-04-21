@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Edit2, Shield, Lock, ExternalLink, Save, X, Loader2, LogOut, Milestone, Award, Clock, Mail, Phone, Globe, CheckCircle2 } from 'lucide-react';
+import { Camera, Edit2, Loader2, LogOut, Milestone, Clock, Mail, Save, X, Shield, CheckCircle2 } from 'lucide-react';
 import { useAppContext } from '../components/AppContext';
 import { supabase } from '../lib/supabase';
 import './Profile.css';
@@ -9,21 +9,19 @@ const Profile = () => {
   const navigate = useNavigate();
   const { user, refreshUser, logout } = useAppContext();
   const fileInputRef = useRef(null);
-  
-  // Independent Editing States
+
   const [isEditingHeader, setIsEditingHeader] = useState(false);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
 
-  const [newNickname, setNewNickname] = useState(user?.nickname || user?.name || '');
+  const [newNickname, setNewNickname] = useState(user?.nickname || '');
   const [newFullName, setNewFullName] = useState(user?.full_name || '');
   const [newStatus, setNewStatus] = useState(user?.status || 'Estudante');
   const [newCountry, setNewCountry] = useState(user?.country || 'Brasil');
   const [newPhone, setNewPhone] = useState(user?.phone || '');
-  
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Sync LOCAL states with GLOBAL context when user data changes (after refresh)
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Sincroniza estados locais quando dados globais mudam (após refresh)
   React.useEffect(() => {
     if (!isEditingHeader && !isEditingInfo) {
       setNewNickname(user?.nickname || '');
@@ -35,7 +33,7 @@ const Profile = () => {
   }, [user, isEditingHeader, isEditingInfo]);
 
   // Email Change State
-  const [emailModalStep, setEmailModalStep] = useState(0); 
+  const [emailModalStep, setEmailModalStep] = useState(0);
   const [tempEmail, setTempEmail] = useState('');
   const [otpToken, setOtpToken] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -43,7 +41,7 @@ const Profile = () => {
   const handleUpdateProfile = async (target) => {
     console.log('[Profile] Iniciando salvamento:', target);
     setIsSaving(true);
-    
+
     try {
       const { error } = await supabase
         .from('profiles')
@@ -61,12 +59,14 @@ const Profile = () => {
 
       console.log('[Profile] Salvo com sucesso!');
 
+      // FIX: sem await — refresh em background sem bloquear a UI
       if (refreshUser) {
         refreshUser().catch(err =>
           console.warn('[Profile] refreshUser falhou:', err.message)
         );
       }
 
+      // FIX: só fecha o modo de edição correto
       if (target === 'header') setIsEditingHeader(false);
       if (target === 'info') setIsEditingInfo(false);
 
@@ -88,7 +88,7 @@ const Profile = () => {
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024) {
-      alert('A imagem é muito grande. Escolha uma imagem de até 2MB.');
+      alert('Imagem muito grande. Escolha uma de até 2MB.');
       return;
     }
 
@@ -101,18 +101,20 @@ const Profile = () => {
         reader.readAsDataURL(file);
       });
 
+      // FIX: usa update em vez de upsert para consistência
       const { error } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: user.id, 
+        .update({
           avatar_url: base64String,
           updated_at: new Date().toISOString()
-        });
+        })
+        .eq('id', user.id);
 
       if (error) throw error;
-      refreshUser();
+
+      refreshUser().catch(err => console.warn('[Profile] refreshUser falhou:', err.message));
     } catch (err) {
-      console.error('Error updating avatar:', err);
+      console.error('Erro ao atualizar avatar:', err);
       alert('Erro ao atualizar foto.');
     } finally {
       setIsSaving(false);
@@ -120,11 +122,9 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    console.log('[Profile] Botão Sair clicado!');
     logout();
   };
 
-  // Email Change Flow
   const startEmailChange = async () => {
     if (!tempEmail || tempEmail === user.email) {
       setEmailError('Insira um novo endereço de e-mail válido.');
@@ -133,12 +133,10 @@ const Profile = () => {
     setIsSaving(true);
     setEmailError('');
     try {
-      console.log('Iniciando troca de email para:', tempEmail);
       const { error } = await supabase.auth.updateUser({ email: tempEmail });
       if (error) throw error;
       setEmailModalStep(2);
     } catch (err) {
-      console.error('Email Update Error:', err);
       setEmailError(err.message || 'Erro ao iniciar troca de e-mail.');
     } finally {
       setIsSaving(false);
@@ -159,7 +157,7 @@ const Profile = () => {
         type: 'email_change'
       });
       if (error) throw error;
-      
+
       await refreshUser();
       setEmailModalStep(0);
       setTempEmail('');
@@ -182,16 +180,16 @@ const Profile = () => {
               <h3>Alterar E-mail</h3>
               <button className="btn-close" onClick={() => setEmailModalStep(0)}><X size={20} /></button>
             </header>
-            
+
             <div className="modal-body">
               {emailModalStep === 1 ? (
                 <>
-                  <p className="modal-desc">Insira seu novo endereço de e-mail. Enviaremos um código de 6 dígitos para confirmação.</p>
+                  <p className="modal-desc">Insira seu novo e-mail. Enviaremos um código de 6 dígitos para confirmação.</p>
                   <div className="input-group-modern">
                     <Mail size={18} className="input-icon" />
-                    <input 
-                      type="email" 
-                      placeholder="Novo e-mail" 
+                    <input
+                      type="email"
+                      placeholder="Novo e-mail"
                       value={tempEmail}
                       autoComplete="off"
                       onChange={(e) => setTempEmail(e.target.value)}
@@ -204,12 +202,12 @@ const Profile = () => {
                 </>
               ) : (
                 <>
-                  <p className="modal-desc">Enviamos um código para <strong>{tempEmail}</strong>. Insira-o abaixo para confirmar:</p>
+                  <p className="modal-desc">Enviamos um código para <strong>{tempEmail}</strong>. Insira-o abaixo:</p>
                   <div className="otp-container">
-                    <input 
-                      type="text" 
-                      maxLength="6" 
-                      placeholder="000000" 
+                    <input
+                      type="text"
+                      maxLength="6"
+                      placeholder="000000"
                       className="otp-input"
                       value={otpToken}
                       onChange={(e) => setOtpToken(e.target.value.replace(/\D/g, ''))}
@@ -230,27 +228,31 @@ const Profile = () => {
       <header className="profile-hero-modern">
         <div className="hero-content">
           <div className="avatar-big-wrapper" onClick={handleAvatarClick}>
-            <img src={user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.nickname?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`} alt="Profile" />
+            <img
+              src={user?.avatarBase64 || `https://ui-avatars.com/api/?name=${user?.nickname?.replace(' ', '+') || 'User'}&background=353534&color=A3E635&size=128`}
+              alt="Profile"
+            />
             <div className="btn-edit-photo-minimal">
               <Camera size={18} />
             </div>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileChange} 
-              style={{ display: 'none' }} 
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
               accept="image/*"
             />
           </div>
+
           <div className="hero-text">
             {isEditingHeader ? (
               <div className="edit-profile-header-card glass-card">
                 <div className="edit-header-row">
                   <div className="header-input-group">
                     <label>Apelido</label>
-                    <input 
-                      type="text" 
-                      value={newNickname} 
+                    <input
+                      type="text"
+                      value={newNickname}
                       onChange={(e) => setNewNickname(e.target.value)}
                       className="header-edit-input"
                       placeholder="Ex: Ryanzin"
@@ -259,9 +261,9 @@ const Profile = () => {
                   </div>
                   <div className="header-input-group">
                     <label>Status</label>
-                    <input 
-                      type="text" 
-                      value={newStatus} 
+                    <input
+                      type="text"
+                      value={newStatus}
                       onChange={(e) => setNewStatus(e.target.value)}
                       className="header-edit-input"
                       placeholder="Ex: Estudante"
@@ -288,14 +290,14 @@ const Profile = () => {
                   </div>
                 </div>
                 <div className="status-badge-row">
-                   <div className="status-pill text-primary">
-                      <Milestone size={14} />
-                      <span>{user?.status || 'Estudante'}</span>
-                   </div>
-                   <div className="status-pill">
-                      <Clock size={14} />
-                      <span>Inscrito em Out 2023</span>
-                   </div>
+                  <div className="status-pill text-primary">
+                    <Milestone size={14} />
+                    <span>{user?.status || 'Estudante'}</span>
+                  </div>
+                  <div className="status-pill">
+                    <Clock size={14} />
+                    <span>Inscrito em Out 2023</span>
+                  </div>
                 </div>
               </>
             )}
@@ -320,7 +322,7 @@ const Profile = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="info-stack">
               <div className="info-block">
                 <label>Nome Completo</label>
@@ -330,7 +332,7 @@ const Profile = () => {
                   <span>{user?.full_name || 'Não informado'}</span>
                 )}
               </div>
-              
+
               <div className="info-block">
                 <label>Endereço de E-mail</label>
                 <div className="email-display-row">
@@ -371,8 +373,8 @@ const Profile = () => {
           <div className="progress-square glass-card">
             <h3>Meu Progresso</h3>
             <div className="empty-state-minimal-v2">
-               <div className="empty-progress-border" />
-               <p className="text-secondary-small">O acompanhamento de progresso das suas trilhas aparecerá aqui assim que você iniciar o primeiro módulo.</p>
+              <div className="empty-progress-border" />
+              <p className="text-secondary-small">O acompanhamento de progresso das suas trilhas aparecerá aqui assim que você iniciar o primeiro módulo.</p>
             </div>
           </div>
 
@@ -389,10 +391,10 @@ const Profile = () => {
       </div>
 
       <footer className="profile-actions-footer">
-         <button className="btn-logout-link" onClick={handleLogout}>
-            <LogOut size={18} />
-            <span>Sair da Conta</span>
-         </button>
+        <button className="btn-logout-link" onClick={handleLogout}>
+          <LogOut size={18} />
+          <span>Sair da Conta</span>
+        </button>
       </footer>
     </div>
   );
