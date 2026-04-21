@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Camera, Edit2, Shield, Lock, ExternalLink, Save, X, Loader2, LogOut, Milestone, Award, Clock, Mail, Phone, Globe, CheckCircle2 } from 'lucide-react';
 import { useAppContext } from '../components/AppContext';
 import { supabase } from '../lib/supabase';
 import './Profile.css';
 
 const Profile = () => {
+  const navigate = useNavigate();
   const { user, refreshUser } = useAppContext();
   const fileInputRef = useRef(null);
   
@@ -119,7 +121,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    window.location.href = '/login';
+    navigate('/login', { replace: true });
   };
 
   // Email Change Flow

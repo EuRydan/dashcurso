@@ -11,7 +11,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const displayName = user?.nickname || user?.full_name || user?.name || user?.email?.split('@')[0] || 'Usuário';
