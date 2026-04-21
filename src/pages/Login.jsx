@@ -109,7 +109,7 @@ const Login = () => {
     setError('');
     setLoading(true);
     const { error: visitorError } = await supabase.auth.signInWithPassword({ 
-      email: 'visitante@lumen.com.br', 
+      email: 'visitante@viesstudios.com.br', 
       password: 'lumen123' 
     });
     if (visitorError) {
