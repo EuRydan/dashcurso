@@ -42,59 +42,35 @@ const Profile = () => {
     console.log('[Profile] Iniciando salvamento:', target);
     setIsSaving(true);
     
-    // Timeout de segurança para o fluxo total não travar a UI
     try {
-      const updateData = { 
-        id: user.id, 
-        full_name: newFullName,
-        status: newStatus,
-        country: newCountry,
-        nickname: newNickname, 
-        phone: newPhone,       
-        updated_at: new Date().toISOString()
-      };
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: newFullName,
+          status: newStatus,
+          country: newCountry,
+          nickname: newNickname,
+          phone: newPhone,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
 
-      console.log('[Profile] Enviando dados via upsert:', updateData);
+      if (error) throw error;
 
-      // 1. Executa o upsert com timeout de 8 segundos
-      const upsertPromise = supabase.from('profiles').upsert(updateData);
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Supabase timeout (8s)')), 8000)
-      );
+      console.log('[Profile] Salvo com sucesso!');
 
-      const { error } = await Promise.race([upsertPromise, timeoutPromise]);
-
-      if (error) {
-        console.error('[Profile] Erro no Upsert:', error);
-        if (error.message?.includes('column')) {
-           console.log('[Profile] Tentando fallback seguro...');
-           await supabase.from('profiles').upsert({
-                id: user.id,
-                full_name: newFullName || newNickname,
-                status: newStatus,
-                country: newCountry,
-                updated_at: new Date().toISOString()
-           });
-        } else {
-          throw error;
-        }
-      }
-
-      console.log('[Profile] Upsert concluído. Atualizando dados globais em background...');
-      
-      // 2. Dispara o refresh em background sem bloquear a UI
       if (refreshUser) {
-        refreshUser().catch(err => 
-          console.warn('[Profile] refreshUser em background falhou:', err.message)
+        refreshUser().catch(err =>
+          console.warn('[Profile] refreshUser falhou:', err.message)
         );
       }
-      
+
       if (target === 'header') setIsEditingHeader(false);
       if (target === 'info') setIsEditingInfo(false);
-      
+
     } catch (err) {
       console.error('[Profile] Erro fatal:', err);
-      alert('Ops! Ocorreu um erro ou a conexão demorou demais: ' + (err.message || 'Erro desconhecido'));
+      alert('Erro ao salvar: ' + (err.message || 'Erro desconhecido'));
     } finally {
       setIsSaving(false);
       console.log('[Profile] Ciclo de salvamento finalizado.');
