@@ -100,9 +100,18 @@ const Profile = () => {
     setShowStatusDropdown(false);
 
     try {
+      // 1. Atualiza os metadados do Auth (evita que volte ao anterior no reload)
+      if (target === 'header') {
+        await supabase.auth.updateUser({
+          data: { nickname: newNickname }
+        });
+      }
+
+      // 2. Salva no banco de dados com UPSERT (cria se não existir)
       const { error } = await supabase
         .from('profiles')
-        .update({
+        .upsert({
+          id: user.id,
           full_name: newFullName,
           status: newStatus,
           country: newCountry,
@@ -110,8 +119,7 @@ const Profile = () => {
           phone: newPhone,
           organization: newOrganization,
           updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+        });
 
       if (error) throw error;
 
