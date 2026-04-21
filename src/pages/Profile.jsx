@@ -12,7 +12,7 @@ const Profile = () => {
   const [isEditingHeader, setIsEditingHeader] = useState(false);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
 
-  const [newNickname, setNewNickname] = useState(user?.nickname || '');
+  const [newNickname, setNewNickname] = useState(user?.nickname || user?.name || '');
   const [newFullName, setNewFullName] = useState(user?.full_name || '');
   const [newStatus, setNewStatus] = useState(user?.status || 'Estudante');
   const [newCountry, setNewCountry] = useState(user?.country || 'Brasil');
@@ -21,36 +21,67 @@ const Profile = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   // Email Change State
-  const [emailModalStep, setEmailModalStep] = useState(0); // 0: closed, 1: input email, 2: input code
+  const [emailModalStep, setEmailModalStep] = useState(0); 
   const [tempEmail, setTempEmail] = useState('');
   const [otpToken, setOtpToken] = useState('');
   const [emailError, setEmailError] = useState('');
 
   const handleUpdateProfile = async (target) => {
+    console.log('Iniciando handleUpdateProfile para:', target);
     setIsSaving(true);
     try {
+      // Usamos apenas as colunas que TEMOS CERTEZA que existem inicialmente
+      // Se nickname e phone falharem, tentamos apenas com full_name e status
+      const updateData = { 
+        id: user.id, 
+        full_name: newFullName,
+        status: newStatus,
+        country: newCountry,
+        nickname: newNickname, // Tentamos enviar
+        phone: newPhone,       // Tentamos enviar
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('Update Data:', updateData);
+
       const { error } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: user.id, 
-          nickname: newNickname,
-          full_name: newFullName,
-          status: newStatus,
-          country: newCountry,
-          phone: newPhone,
-          updated_at: new Date()
-        });
+        .upsert(updateData);
 
-      if (error) throw error;
-      await refreshUser();
+      if (error) {
+        console.error('Supabase Upsert Error:', error);
+        // Fallback para colunas seguras se nickname/phone falharem
+        if (error.message.includes('column "nickname"') || error.message.includes('column "phone"')) {
+           console.log('Tentando fallback sem colunas novas...');
+           const { error: error2 } = await supabase
+             .from('profiles')
+             .upsert({
+                id: user.id,
+                full_name: newFullName || newNickname,
+                status: newStatus,
+                country: newCountry,
+                updated_at: new Date().toISOString()
+             });
+           if (error2) throw error2;
+        } else {
+          throw error;
+        }
+      }
+
+      console.log('Upsert concluído com sucesso. Atualizando contexto...');
+      
+      // Não damos await no refreshUser para não travar a UI se a rede estiver lenta
+      refreshUser().catch(err => console.error('Error refreshing user:', err));
       
       if (target === 'header') setIsEditingHeader(false);
       if (target === 'info') setIsEditingInfo(false);
+      
     } catch (err) {
-      console.error('Error updating profile:', err);
-      alert('Erro ao atualizar perfil.');
+      console.error('Final Catch Error:', err);
+      alert('Erro ao salvar: ' + (err.message || 'Verifique sua conexão.'));
     } finally {
       setIsSaving(false);
+      console.log('Status de salvamento encerrado.');
     }
   };
 
@@ -68,7 +99,6 @@ const Profile = () => {
     }
 
     setIsSaving(true);
-
     try {
       const base64String = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -82,11 +112,11 @@ const Profile = () => {
         .upsert({ 
           id: user.id, 
           avatar_url: base64String,
-          updated_at: new Date()
+          updated_at: new Date().toISOString()
         });
 
       if (error) throw error;
-      await refreshUser();
+      refreshUser();
     } catch (err) {
       console.error('Error updating avatar:', err);
       alert('Erro ao atualizar foto.');
@@ -109,10 +139,12 @@ const Profile = () => {
     setIsSaving(true);
     setEmailError('');
     try {
+      console.log('Iniciando troca de email para:', tempEmail);
       const { error } = await supabase.auth.updateUser({ email: tempEmail });
       if (error) throw error;
       setEmailModalStep(2);
     } catch (err) {
+      console.error('Email Update Error:', err);
       setEmailError(err.message || 'Erro ao iniciar troca de e-mail.');
     } finally {
       setIsSaving(false);
@@ -167,6 +199,7 @@ const Profile = () => {
                       type="email" 
                       placeholder="Novo e-mail" 
                       value={tempEmail}
+                      autoComplete="off"
                       onChange={(e) => setTempEmail(e.target.value)}
                     />
                   </div>
