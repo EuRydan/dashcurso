@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Wand2, ShieldCheck, Loader2, Mail, Lock, User, ArrowRight, Eye, EyeOff, Sparkles, Rocket, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Wand2, ShieldCheck, Loader2, Mail, Lock, User, ArrowRight, Eye, EyeOff, Sparkles, Rocket, CheckCircle2, RotateCcw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './Login.css';
 
@@ -27,12 +27,14 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   // Registration Specific States
-  const [regStep, setRegStep] = useState(0); // 0: Data, 1: OTP
+  const [regStep, setRegStep] = useState(0); 
   const [regFirstName, setRegFirstName] = useState('');
   const [regLastName, setRegLastName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regOtp, setRegOtp] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
+  const [resendLoading, setResendLoading] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -41,6 +43,14 @@ const Login = () => {
     };
     checkUser();
   }, [navigate]);
+
+  // Timer logic for resend button
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendTimer]);
 
   const handleValidationSubmit = async (e, isLoginForm) => {
     e.preventDefault();
@@ -54,7 +64,6 @@ const Login = () => {
         if (signInError) throw new Error('Credenciais inválidas. Tente novamente.');
         navigate('/');
       } else {
-        // CADASTRO - PASSO 1
         if (!regEmail || !regPassword || !regFirstName || !regLastName) {
           throw new Error('Preencha todos os campos obrigatórios.');
         }
@@ -72,9 +81,8 @@ const Login = () => {
         });
         
         if (signUpError) throw signUpError;
-        
-        // Mover para o passo do OTP
         setRegStep(1);
+        setResendTimer(60); // Inicia timer de 60s
       }
     } catch (err) {
       setError(err.message);
@@ -83,9 +91,28 @@ const Login = () => {
     }
   };
 
+  const handleResendOtp = async () => {
+    if (resendTimer > 0 || resendLoading) return;
+    setResendLoading(true);
+    setError('');
+    try {
+      const { error: resendError } = await supabase.auth.resend({
+        email: regEmail,
+        type: 'signup'
+      });
+      if (resendError) throw resendError;
+      setResendTimer(60);
+      alert('Novo código enviado com sucesso!');
+    } catch (err) {
+      setError('Erro ao reenviar código. Tente novamente em instantes.');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleVerifyRegister = async (e) => {
     e.preventDefault();
-    if (regOtp.length !== 6) return;
+    if (regOtp.length < 6) return;
     setError('');
     setLoading(true);
     try {
@@ -133,7 +160,7 @@ const Login = () => {
     <div className="auth-master-container">
       <div className={`auth-split-layout ${isLogin ? 'is-login-state' : 'is-register-state'}`}>
         
-        {/* PAINEL VISUAL (SLIDING) */}
+        {/* PAINEL VISUAL */}
         <div className="auth-visual-panel">
           <div className="visual-overlay"></div>
           <div className="visual-content">
@@ -298,12 +325,24 @@ const Login = () => {
                       disabled={loading}
                       autoFocus
                     />
-                    <p className="otp-hint">O código pode levar até 1 minuto.</p>
+                    
+                    <div className="otp-actions-row">
+                       <p className="otp-hint">O código pode levar até 1 minuto.</p>
+                       <button 
+                         type="button" 
+                         className="btn-resend" 
+                         disabled={resendTimer > 0 || resendLoading}
+                         onClick={handleResendOtp}
+                       >
+                         {resendLoading ? <Loader2 className="spin" size={14} /> : <RotateCcw size={14} />}
+                         {resendTimer > 0 ? `Reenviar em ${resendTimer}s` : 'Reenviar código'}
+                       </button>
+                    </div>
                   </div>
 
                   {error && regStep === 1 && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
 
-                  <button type="submit" className="btn-vies-primary" disabled={loading || regOtp.length < 8}>
+                  <button type="submit" className="btn-vies-primary" disabled={loading || regOtp.length < 6}>
                      {loading ? <Loader2 className="spin" size={20} /> : (
                        <>
                          <span>Finalizar Ativação</span>
