@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { PlayCircle, Clock, Calendar, CheckCircle2, Video, List, Play } from 'lucide-react';
+import { PlayCircle, Clock, Calendar, CheckCircle2, Video, List, Play, X } from 'lucide-react';
 import VimeoPlayer from '../components/VimeoPlayer';
 import { WORKSHOPS } from '../constants/catalog';
 import './Workshops.css';
 
 const Workshops = () => {
-  const [activeFilter, setActiveFilter] = useState('Todos');
+  const [activeWorkshop, setActiveWorkshop] = useState(WORKSHOPS[0]);
   const [playingVideoId, setPlayingVideoId] = useState(null);
   const [seekTo, setSeekTo] = useState(null);
 
@@ -20,14 +20,20 @@ const Workshops = () => {
       setPlayingVideoId(videoId);
     }
     setSeekTo(seconds);
-    // Pequeno delay para garantir que o estado seja processado
     setTimeout(() => setSeekTo(null), 1000);
   };
 
-  const heroWorkshop = WORKSHOPS && WORKSHOPS.length > 0 ? WORKSHOPS[0] : null;
-  const gridWorkshops = WORKSHOPS && WORKSHOPS.length > 1 ? WORKSHOPS.slice(1) : [];
+  const handleSelectWorkshop = (ws) => {
+    setActiveWorkshop(ws);
+    setPlayingVideoId(ws.vimeoId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  if (!heroWorkshop) {
+  const handleClosePlayer = () => {
+    setPlayingVideoId(null);
+  };
+
+  if (!activeWorkshop) {
     return (
       <div className="dash-loading">
         <Video size={40} className="text-primary animate-pulse" />
@@ -44,25 +50,30 @@ const Workshops = () => {
 
       <div className="workshops-content">
         
-        {/* HERO WORKSHOP */}
+        {/* SPOTLIGHT SECTION */}
         <section className="hero-workshop">
           <div className="hero-cover-wrapper">
-             {playingVideoId === heroWorkshop.vimeoId ? (
-                <VimeoPlayer 
-                  videoId={heroWorkshop.vimeoId} 
-                  title={heroWorkshop.title} 
-                  seekTo={seekTo}
-                />
+             {playingVideoId === activeWorkshop.vimeoId ? (
+                <>
+                  <VimeoPlayer 
+                    videoId={activeWorkshop.vimeoId} 
+                    title={activeWorkshop.title} 
+                    seekTo={seekTo}
+                  />
+                  <button className="btn-close-player" onClick={handleClosePlayer} title="Fechar Player">
+                    <X size={20} />
+                  </button>
+                </>
              ) : (
                 <div className="hero-poster">
-                  <img src={heroWorkshop.cover} alt={heroWorkshop.title} className="hero-cover" />
+                  <img src={activeWorkshop.cover} alt={activeWorkshop.title} className="hero-cover" />
                   <div className="hero-overlay"></div>
-                  {heroWorkshop.isNew && (
+                  {activeWorkshop.isNew && (
                     <div className="badge-new">
                       <Video size={14} /> <span>NOVO ENCONTRO</span>
                     </div>
                   )}
-                  <button className="btn-hero-play" onClick={() => setPlayingVideoId(heroWorkshop.vimeoId)}>
+                  <button className="btn-hero-play" onClick={() => setPlayingVideoId(activeWorkshop.vimeoId)}>
                       <PlayCircle size={64} strokeWidth={1.5} />
                   </button>
                 </div>
@@ -71,16 +82,16 @@ const Workshops = () => {
           
           <div className="hero-details">
             <div className="meta-info">
-              <span className="info-pill"><Clock size={14} /> {heroWorkshop.duration}</span>
-              <span className="info-pill highlight"><Calendar size={14} /> {heroWorkshop.date}</span>
+              <span className="info-pill"><Clock size={14} /> {activeWorkshop.duration}</span>
+              <span className="info-pill highlight"><Calendar size={14} /> {activeWorkshop.date}</span>
             </div>
             
             <div className="title-area">
-                <h2>{heroWorkshop.title}</h2>
-                <span className="subtitle">{heroWorkshop.subtitle}</span>
+                <h2>{activeWorkshop.title}</h2>
+                <span className="subtitle">{activeWorkshop.subtitle}</span>
             </div>
             
-            <p className="description">{heroWorkshop.description}</p>
+            <p className="description">{activeWorkshop.description}</p>
             
             <div className="timestamps-box glass-card">
               <div className="ts-header">
@@ -88,11 +99,11 @@ const Workshops = () => {
                   <h4>Momentos Chave:</h4>
               </div>
               <div className="time-list">
-                {heroWorkshop.timestamps.map((ts, idx) => (
+                {activeWorkshop.timestamps.map((ts, idx) => (
                   <button 
                     key={idx} 
                     className="time-row" 
-                    onClick={() => handleTimeJump(ts.seconds, heroWorkshop.vimeoId)}
+                    onClick={() => handleTimeJump(ts.seconds, activeWorkshop.vimeoId)}
                   >
                     <span className="ts-time">{formatTime(ts.seconds)}</span>
                     <span className="ts-divider">—</span>
@@ -104,19 +115,23 @@ const Workshops = () => {
           </div>
         </section>
 
-        {/* LISTA SECUNDÁRIA */}
+        {/* BIBLIOTECA DE MASTERCLASSES */}
         <div className="section-divider">
           <h3>Biblioteca de Masterclasses</h3>
         </div>
 
         <section className="workshops-grid">
-          {gridWorkshops.map(ws => (
-            <div key={ws.id} className="ws-mini-card glass-card">
+          {WORKSHOPS.map(ws => (
+            <div 
+              key={ws.id} 
+              className={`ws-mini-card glass-card ${activeWorkshop.id === ws.id ? 'active-ws' : ''}`}
+              onClick={() => handleSelectWorkshop(ws)}
+            >
               <div className="ws-mini-thumb">
                 <img src={ws.cover} alt={ws.title} />
-                <button className="btn-mini-play" onClick={() => setPlayingVideoId(ws.vimeoId)}>
-                  <Play size={16} fill="currentColor" />
-                </button>
+                <div className="mini-play-overlay">
+                  <Play size={20} fill="currentColor" />
+                </div>
               </div>
               <div className="ws-mini-info">
                 <span className="ws-cat">{ws.category}</span>
