@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlayCircle, Lock, Play } from 'lucide-react';
+import { PlayCircle, Lock, Play, Star } from 'lucide-react';
 import { useAppContext } from '../components/AppContext';
 import './Home.css';
 
@@ -15,6 +15,21 @@ const Home = () => {
     <div className="home-page">
       <header className="home-header">
         <h1>Bem-vindo, {firstName}</h1>
+
+        <div className="premium-upsell glass-card">
+          <div className="upsell-content">
+            <div className="upsell-icon">
+              <Star size={24} fill="currentColor" />
+            </div>
+            <div className="upsell-text">
+              <h3>Eleve o seu nível</h3>
+              <p>Desbloqueie mentorias exclusivas e conteúdos avançados sendo Premium.</p>
+            </div>
+          </div>
+          <button className="btn-upsell" onClick={() => window.location.href = '/premium'}>
+            Ver Planos
+          </button>
+        </div>
       </header>
 
       {continueWatching.length > 0 && (

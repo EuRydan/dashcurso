@@ -41,7 +41,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
           </NavLink>
           <NavLink to="/workshops" className={({ isActive }) => 'nav-link ' + (isActive ? 'active' : '')} onClick={closeSidebar}>
             <Radio size={18} />
-            <span>Encontros ao Vivo</span>
+            <span>Gravações e Workshops</span>
           </NavLink>
           <NavLink to="/certificates" className={({ isActive }) => 'nav-link ' + (isActive ? 'active' : '')} onClick={closeSidebar}>
             <Award size={18} />
@@ -55,11 +55,6 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
       </div>
 
       <div className="sidebar-bottom">
-        <NavLink to="/premium" className={({ isActive }) => 'nav-action premium-btn ' + (isActive ? 'active' : '')} onClick={closeSidebar}>
-          <Star size={18} fill="currentColor" />
-          <span>Fazer upgrade</span>
-        </NavLink>
-        
         <NavLink to="/settings" className={({ isActive }) => 'nav-action ' + (isActive ? 'active' : '')} onClick={closeSidebar}>
           <Settings size={18} />
           <span>Configurações</span>
