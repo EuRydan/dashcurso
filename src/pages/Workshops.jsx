@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlayCircle, Clock, Calendar, CheckCircle2, Video, List } from 'lucide-react';
+import { PlayCircle, Clock, Calendar, CheckCircle2, Video, List, Play } from 'lucide-react';
 import VimeoPlayer from '../components/VimeoPlayer';
 import { WORKSHOPS } from '../constants/catalog';
 import './Workshops.css';

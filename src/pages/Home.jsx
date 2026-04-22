@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { PlayCircle, Lock, Play, Star, Calendar, Loader2 } from 'lucide-react';
+import { PlayCircle, Clock, Calendar, CheckCircle2, Video, List, Play, Star, Loader2 } from 'lucide-react';
 import { useAppContext } from '../components/AppContext';
 import { supabase } from '../lib/supabase';
 import { COURSES, WORKSHOPS } from '../constants/catalog';
@@ -21,7 +21,6 @@ const Home = () => {
     const fetchDashData = async () => {
       setLoading(true);
       try {
-        // 1. Buscar todo o progresso do usuário
         const { data: progressData } = await supabase
           .from('video_progress')
           .select('*')
@@ -29,42 +28,43 @@ const Home = () => {
           .order('updated_at', { ascending: false });
 
         if (progressData && progressData.length > 0) {
-          // Achar a última aula (Continue Watching)
-          const last = progressData[0];
-          // Procurar no catálogo qual aula é essa
-          let foundLesson = null;
-          COURSES.forEach(c => {
-            const lesson = c.lessons.find(l => l.vimeo_id === last.video_id);
-            if (lesson) {
-              foundLesson = { 
-                ...lesson, 
-                courseTitle: c.title, 
-                courseThumb: c.thumbnail,
-                rawProgress: last 
-              };
-            }
-          });
-          setLastLesson(foundLesson);
-
           // Calcular progresso de cada curso
           const calculatedProgress = COURSES.map(course => {
-            const totalLessons = course.lessons.length;
-            const completedCount = course.lessons.filter(lesson => 
-              progressData.find(p => p.video_id === lesson.vimeo_id && p.completed)
+            const total = course.lessons.length;
+            if (total === 0) return { ...course, percent: 0 };
+            
+            const completed = course.lessons.filter(l => 
+              progressData.find(p => p.video_id === l.vimeo_id && p.completed)
             ).length;
             
             return {
               ...course,
-              percent: Math.round((completedCount / totalLessons) * 100)
+              percent: Math.round((completed / total) * 100)
             };
           });
           setCourseProgress(calculatedProgress);
+
+          // Achar a última aula e anexar o progresso do curso dela
+          const last = progressData[0];
+          let found = null;
+          COURSES.forEach(c => {
+            const lesson = c.lessons.find(l => l.vimeo_id === last.video_id);
+            if (lesson) {
+              const courseInfo = calculatedProgress.find(cp => cp.id === c.id);
+              found = { 
+                ...lesson, 
+                courseTitle: c.title, 
+                courseThumb: c.thumbnail,
+                percent: courseInfo ? courseInfo.percent : 0
+              };
+            }
+          });
+          setLastLesson(found);
         } else {
-          // Se não houver progresso, o progresso de todos os cursos é 0%
           setCourseProgress(COURSES.map(c => ({ ...c, percent: 0 })));
         }
 
-        // 2. Buscar próximo encontro (Simplificado: pega o mais recente da tabela)
+        // Próximo encontro
         const { data: meetingData } = await supabase
           .from('encontros')
           .select('*')
@@ -75,8 +75,7 @@ const Home = () => {
         if (meetingData) setNextMeeting(meetingData);
 
       } catch (err) {
-        console.warn('Erro ao carregar dados do dashboard:', err);
-        // Fallback para cursos mesmo com erro no banco
+        console.warn('Dashboard Data Error:', err);
         setCourseProgress(COURSES.map(c => ({ ...c, percent: 0 })));
       } finally {
         setLoading(false);
@@ -115,20 +114,18 @@ const Home = () => {
         </div>
       </header>
 
-      {/* SEÇÃO CONTINUE ASSISTINDO */}
       {lastLesson && (
         <section className="dash-section">
           <h2>Continue de onde parou</h2>
           <ContinueWatching 
             lesson={lastLesson} 
-            progressPercent={75} // Simplificado por enquanto, ou calculado via tempo assistido
+            progressPercent={lastLesson.percent}
             onContinue={() => window.location.href = '/courses'} 
           />
         </section>
       )}
 
       <div className="dash-grid-main">
-        {/* COLUNA ESQUERDA: CURSOS */}
         <div className="dash-col-left">
           <section className="dash-section">
             <h2>Seus Cursos</h2>
@@ -157,7 +154,6 @@ const Home = () => {
           </section>
         </div>
 
-        {/* COLUNA DIREITA: EVENTOS E NOTAS */}
         <div className="dash-col-right">
           <section className="dash-section">
             <h2>Próximo Encontro</h2>
