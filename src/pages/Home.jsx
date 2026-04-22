@@ -15,19 +15,6 @@ const Home = () => {
     <div className="home-page">
       <header className="home-header">
         <h1>Bem-vindo, {firstName}</h1>
-
-        <div className="notice-banner glass-card">
-          <div className="notice-left">
-            <div className="notice-icon">🎬</div>
-            <div className="notice-text">
-              <span className="notice-badge">NOVO</span>
-              <p>Gravação disponível: <strong>Real Talk #1 com Filipe Canto</strong> sobre mercado e carreira.</p>
-            </div>
-          </div>
-          <button className="btn-notice" onClick={() => window.location.href = '/workshops'}>
-            Assistir agora
-          </button>
-        </div>
       </header>
 
       {continueWatching.length > 0 && (
@@ -57,7 +44,7 @@ const Home = () => {
       )}
 
       <section className="modules-section">
-        <h2>Todos os Módulos</h2>
+        <h2>Seus encontros ao vivo</h2>
         <div className="modules-list">
           {modules.length > 0 ? (
             modules.map((m, i) => (
@@ -75,10 +62,23 @@ const Home = () => {
               </div>
             ))
           ) : (
-            <p className="text-secondary" style={{ fontSize: '14px' }}>Nenhum módulo disponível.</p>
+            <p className="text-secondary" style={{ fontSize: '14px' }}>Nenhum encontro disponível no momento.</p>
           )}
         </div>
       </section>
+
+      <div className="notice-banner glass-card">
+        <div className="notice-left">
+          <div className="notice-icon">🎬</div>
+          <div className="notice-text">
+            <span className="notice-badge">NOVO</span>
+            <p>Gravação disponível: <strong>Real Talk #1 com Filipe Canto</strong> sobre mercado e carreira.</p>
+          </div>
+        </div>
+        <button className="btn-notice" onClick={() => window.location.href = '/workshops'}>
+          Assistir agora
+        </button>
+      </div>
     </div>
   );
 };
