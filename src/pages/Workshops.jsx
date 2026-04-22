@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import { PlayCircle, Clock, Calendar, CheckCircle2, Video, List, Play, X } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { PlayCircle, Clock, Calendar, CheckCircle2, Video, List, Play, X, Filter } from 'lucide-react';
 import VimeoPlayer from '../components/VimeoPlayer';
 import { WORKSHOPS } from '../constants/catalog';
 import './Workshops.css';
 
+const CATEGORIES = ['Todos', 'Workshop', 'Talk', 'Palestra', 'Masterclass'];
+
 const Workshops = () => {
+  const [activeFilter, setActiveFilter] = useState('Todos');
   const [activeWorkshop, setActiveWorkshop] = useState(WORKSHOPS[0]);
   const [playingVideoId, setPlayingVideoId] = useState(null);
   const [seekTo, setSeekTo] = useState(null);
@@ -13,6 +16,14 @@ const Workshops = () => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const isRecent = (dateString) => {
+    if (!dateString) return false;
+    const createdDate = new Date(dateString);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    return createdDate > sevenDaysAgo;
   };
 
   const handleTimeJump = (seconds, videoId) => {
@@ -29,9 +40,10 @@ const Workshops = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleClosePlayer = () => {
-    setPlayingVideoId(null);
-  };
+  const filteredWorkshops = useMemo(() => {
+    if (activeFilter === 'Todos') return WORKSHOPS;
+    return WORKSHOPS.filter(ws => ws.category === activeFilter);
+  }, [activeFilter]);
 
   if (!activeWorkshop) {
     return (
@@ -60,7 +72,7 @@ const Workshops = () => {
                     title={activeWorkshop.title} 
                     seekTo={seekTo}
                   />
-                  <button className="btn-close-player" onClick={handleClosePlayer} title="Fechar Player">
+                  <button className="btn-close-player" onClick={() => setPlayingVideoId(null)} title="Fechar Player">
                     <X size={20} />
                   </button>
                 </>
@@ -68,9 +80,9 @@ const Workshops = () => {
                 <div className="hero-poster">
                   <img src={activeWorkshop.cover} alt={activeWorkshop.title} className="hero-cover" />
                   <div className="hero-overlay"></div>
-                  {activeWorkshop.isNew && (
+                  {isRecent(activeWorkshop.createdAt) && (
                     <div className="badge-new">
-                      <Video size={14} /> <span>NOVO ENCONTRO</span>
+                      <Video size={14} /> <span>RECENTE</span>
                     </div>
                   )}
                   <button className="btn-hero-play" onClick={() => setPlayingVideoId(activeWorkshop.vimeoId)}>
@@ -115,20 +127,40 @@ const Workshops = () => {
           </div>
         </section>
 
-        {/* BIBLIOTECA DE MASTERCLASSES */}
-        <div className="section-divider">
-          <h3>Biblioteca de Masterclasses</h3>
+        {/* FILTERS & LIBRARY */}
+        <div className="library-header">
+          <div className="section-divider">
+            <h3>Biblioteca de Masterclasses</h3>
+          </div>
+
+          <div className="filter-bar">
+             <div className="filter-label">
+                <Filter size={16} /> <span>Filtrar por:</span>
+             </div>
+             <div className="category-chips">
+                {CATEGORIES.map(cat => (
+                  <button 
+                    key={cat} 
+                    className={`category-chip ${activeFilter === cat ? 'active' : ''}`}
+                    onClick={() => setActiveFilter(cat)}
+                  >
+                    {cat}
+                  </button>
+                ))}
+             </div>
+          </div>
         </div>
 
         <section className="workshops-grid">
-          {WORKSHOPS.map(ws => (
+          {filteredWorkshops.map(ws => (
             <div 
               key={ws.id} 
-              className={`ws-mini-card glass-card ${activeWorkshop.id === ws.id ? 'active-ws' : ''}`}
+              className={`ws-mini-card glass-card ${activeWorkshop.id === ws.id ? 'active-ws' : ''} animate-entry`}
               onClick={() => handleSelectWorkshop(ws)}
             >
               <div className="ws-mini-thumb">
                 <img src={ws.cover} alt={ws.title} />
+                {isRecent(ws.createdAt) && <div className="mini-badge-new">NOVO</div>}
                 <div className="mini-play-overlay">
                   <Play size={20} fill="currentColor" />
                 </div>
@@ -140,6 +172,11 @@ const Workshops = () => {
               </div>
             </div>
           ))}
+          {filteredWorkshops.length === 0 && (
+            <div className="empty-filter-state">
+               <p>Nenhuma gravação encontrada nesta categoria.</p>
+            </div>
+          )}
         </section>
 
       </div>

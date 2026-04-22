@@ -320,29 +320,105 @@
   letter-spacing: 0.1em;
 }
 
-.ws-mini-info h4 {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 4px 0 8px 0;
+/* FILTER BAR */
+.library-header {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 60px;
 }
 
-.ws-mini-info p {
-  font-size: 13px;
+.library-header .section-divider {
+  padding-top: 0;
+  margin-bottom: 0;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 8px;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.section-divider {
-  padding-top: 60px;
-  margin-bottom: 32px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 16px;
+.category-chips {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.workshops-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 32px;
-  padding-bottom: 100px;
+.category-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-secondary);
+  padding: 8px 18px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-chip:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.category-chip.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #000;
+  box-shadow: 0 4px 15px rgba(132, 204, 22, 0.3);
+}
+
+/* MINI BADGE NEW */
+.mini-badge-new {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--color-primary);
+  color: #000;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 4px;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* ANIMATIONS */
+.animate-entry {
+  animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.empty-filter-state {
+  grid-column: 1 / -1;
+  padding: 80px 0;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  font-style: italic;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
 }
 
 /* Estilos movidos para o index.css global como .empty-state-clean */
