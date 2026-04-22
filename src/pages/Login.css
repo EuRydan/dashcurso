@@ -426,16 +426,54 @@
 
 .btn-link-subtle:hover { color: #fff; }
 
-.error-box {
-  background: rgba(239, 68, 68, 0.1);
-  color: #f87171;
-  padding: 12px;
-  border-radius: 12px;
+.error-box, .success-box-inline {
+  padding: 14px 20px;
+  border-radius: 16px;
   font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  border: 1px solid rgba(239, 68, 68, 0.1);
+  gap: 12px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.error-box {
+  background: rgba(239, 68, 68, 0.08);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.success-box-inline {
+  background: rgba(163, 230, 53, 0.08);
+  color: var(--vies-primary);
+  border: 1px solid rgba(163, 230, 53, 0.2);
+  flex-direction: column;
+  text-align: center;
+  padding: 24px;
+}
+
+.success-box-inline span {
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.btn-link-sm {
+  background: none;
+  border: none;
+  color: var(--vies-muted);
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 5px;
+  transition: color 0.2s;
+}
+
+.btn-link-sm:hover {
+  color: #fff;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .spin { animation: spin 1s linear infinite; }

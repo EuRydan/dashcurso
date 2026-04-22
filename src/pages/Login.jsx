@@ -110,39 +110,43 @@ const Login = () => {
     }
   };
 
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
+
   const handleSendOtpLogin = async () => {
     if (!email) {
-      setError('Insira seu e-mail para receber o código.');
+      setError('Insira seu e-mail para receber o link mágico.');
       return;
     }
     setError('');
     setLoading(true);
+    setMagicLinkSent(false);
+
     try {
-      console.log('[Login] Solicitando OTP para login...');
+      console.log('[Login] Solicitando Link Mágico...');
       const { error: otpError } = await Promise.race([
         supabase.auth.signInWithOtp({ 
           email,
           options: {
-            shouldCreateUser: false // Só permite login para quem já tem conta
+            shouldCreateUser: false,
+            emailRedirectTo: window.location.origin
           }
         }),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Tempo de resposta excedido.')), 8000)
+          setTimeout(() => reject(new Error('Tempo de resposta excedido. Verifique sua conexão.')), 8000)
         )
       ]);
 
       if (otpError) {
-        // Se o erro for "email rate limit exceeded", avisar amigavelmente
         if (otpError.message.includes('rate limit')) {
           throw new Error('Limite de envios atingido. Aguarde 60 segundos antes de tentar novamente.');
         }
-        throw new Error(otpError.message);
+        throw otpError;
       }
       
-      setLoginStep(1);
-      setResendTimer(60);
+      setMagicLinkSent(true);
+      // Opcional: Voltar ao estado normal após alguns segundos ou manter a mensagem
     } catch (err) {
-      setError(err.message || 'Erro inesperado ao enviar código.');
+      setError(err.message || 'Erro inesperado ao enviar link mágico.');
     } finally {
       setLoading(false);
     }
@@ -387,23 +391,34 @@ const Login = () => {
 
                     {error && isLogin && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
 
-                    <button type="submit" className="btn-vies-primary" disabled={loading}>
-                      {loading ? <Loader2 className="spin" size={20} /> : (
-                        <>
-                          <span>Acessar</span>
-                          <ArrowRight size={18} />
-                        </>
-                      )}
-                    </button>
+                    {magicLinkSent ? (
+                      <div className="success-box-inline">
+                        <CheckCircle2 size={16} />
+                        <span>Link enviado! Verifique seu e-mail.</span>
+                        <button type="button" className="btn-link-sm" onClick={() => setMagicLinkSent(false)}>Tentar outra conta</button>
+                      </div>
+                    ) : (
+                      <>
+                        <button type="submit" className="btn-vies-primary" disabled={loading}>
+                          {loading ? <Loader2 className="spin" size={20} /> : (
+                            <>
+                              <span>Acessar</span>
+                              <ArrowRight size={18} />
+                            </>
+                          )}
+                        </button>
 
-                    <div className="alternative-entry">
-                      <button type="button" className="btn-magic" onClick={handleSendOtpLogin} disabled={loading}>
-                        <Wand2 size={16} /> Link Mágico
-                      </button>
-                      <button type="button" className="btn-visitor-new" onClick={handleVisitorLogin} disabled={loading}>
-                        <ShieldCheck size={16} /> Ver Demo
-                      </button>
-                    </div>
+                        <div className="alternative-entry">
+                          <button type="button" className="btn-magic" onClick={handleSendOtpLogin} disabled={loading}>
+                            {loading ? <Loader2 className="spin" size={16} /> : <Wand2 size={16} />} 
+                            Link Mágico
+                          </button>
+                          <button type="button" className="btn-visitor-new" onClick={handleVisitorLogin} disabled={loading}>
+                            <ShieldCheck size={16} /> Ver Demo
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </form>
                 </>
               ) : (
