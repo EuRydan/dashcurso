@@ -24,13 +24,13 @@ const Home = () => {
               <p>Gravação disponível: <strong>Real Talk #1 com Filipe Canto</strong> sobre mercado e carreira.</p>
             </div>
           </div>
-          <button className="btn-notice" onClick={() => window.location.href = '/courses'}>
+          <button className="btn-notice" onClick={() => window.location.href = '/workshops'}>
             Assistir agora
           </button>
         </div>
       </header>
 
-      {continueWatching.length > 0 ? (
+      {continueWatching.length > 0 && (
         <section className="bento-grid">
           {continueWatching.map(course => (
             <div key={course.id} className="bento-card glass-card">
@@ -54,14 +54,6 @@ const Home = () => {
             </div>
           ))}
         </section>
-      ) : (
-        <div className="empty-state-clean">
-          <div className="empty-icon-clean">
-            <Play size={32} strokeWidth={1.5} />
-          </div>
-          <h4>Nenhuma atividade recente</h4>
-          <p>Você ainda não iniciou nenhum curso. Explore o catálogo e comece sua jornada hoje mesmo!</p>
-        </div>
       )}
 
       <section className="modules-section">
