@@ -13,7 +13,7 @@ const MOCK_WORKSHOPS = [
     category: "Real Talk",
     isNew: true,
     vimeoId: "76979871", // Placeholder até você ter o ID real
-    cover: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1200&auto=format&fit=crop",
+    cover: "/images/filipe-canto.png",
     timestamps: [] // Vazio até você separar os tempos
   },
   {
