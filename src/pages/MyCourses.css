@@ -190,9 +190,27 @@
   border-color: var(--color-primary-soft);
 }
 
-.playlist-item.locked {
-  opacity: 0.4;
-  cursor: not-allowed;
+.item-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+}
+
+.dot-progress {
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-bg-subtle);
+  border: 2px solid var(--color-text-secondary);
+  border-radius: 50%;
+}
+
+.dot-done {
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--color-primary-soft);
 }
 
 .status-done {
