@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import Settings from './pages/Settings';
 import Premium from './pages/Premium';
 import Workshops from './pages/Workshops';
+import ResetPassword from './pages/ResetPassword';
 import { AppProvider } from './components/AppContext';
 import './index.css';
 
@@ -82,6 +83,7 @@ function App() {
         <Routes>
           {/* Public Route */}
           <Route path="/login" element={<Login />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         
         {/* Protected Routes Wrapper */}
         <Route element={<AuthGuard><DashboardLayout /></AuthGuard>}>

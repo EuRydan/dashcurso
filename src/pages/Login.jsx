@@ -148,6 +148,31 @@ const Login = () => {
     }
   };
 
+  const handleResetPasswordRequest = async (e) => {
+    if (e) e.preventDefault();
+    if (!email) {
+      setError('Insira seu e-mail para receber o link de recuperação.');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      console.log('[Login] Solicitando link de reset de senha...');
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (resetError) throw resetError;
+
+      alert('Link de recuperação enviado! Verifique sua caixa de entrada.');
+      setLoginStep(0);
+    } catch (err) {
+      setError(err.message || 'Erro ao enviar link de recuperação.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleVerifyOtpLogin = async (e) => {
     if (e) e.preventDefault();
     if (loginOtp.length < 6) return;
@@ -351,7 +376,13 @@ const Login = () => {
                     </div>
 
                     <div className="form-links">
-                      <a href="#reset" className="link-subtle">Esqueceu a senha?</a>
+                      <button 
+                        type="button" 
+                        className="link-subtle" 
+                        onClick={() => { setLoginStep(2); setError(''); }}
+                      >
+                        Esqueceu a senha?
+                      </button>
                     </div>
 
                     {error && isLogin && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
@@ -414,6 +445,42 @@ const Login = () => {
                     )}
                   </button>
                   <button type="button" className="btn-link-subtle w-full mt-4" onClick={() => setLoginStep(0)}>Usar senha</button>
+                </form>
+              ) : (
+                <form onSubmit={handleResetPasswordRequest} className="main-form">
+                  <header className="form-header-small">
+                    <p className="text-center mb-6">Enviaremos um link de recuperação para o seu e-mail.</p>
+                  </header>
+
+                  <div className="field-modern">
+                    <Mail size={18} className="field-icon-left" />
+                    <input 
+                      type="email" 
+                      placeholder="Seu e-mail cadastrado" 
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)} 
+                      required 
+                    />
+                  </div>
+
+                  {error && isLogin && <div className="error-box"><AlertCircle size={14} /> {error}</div>}
+
+                  <button type="submit" className="btn-vies-primary" disabled={loading}>
+                    {loading ? <Loader2 className="spin" size={20} /> : (
+                      <>
+                        <span>Enviar Link de Recuperação</span>
+                        <Mail size={18} />
+                      </>
+                    )}
+                  </button>
+
+                  <button 
+                    type="button" 
+                    className="btn-link-subtle w-full mt-4" 
+                    onClick={() => { setLoginStep(0); setError(''); }}
+                  >
+                    Voltar para o login
+                  </button>
                 </form>
               )}
             </div>
