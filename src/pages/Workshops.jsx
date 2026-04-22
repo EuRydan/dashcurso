@@ -1,70 +1,31 @@
 import React, { useState } from 'react';
-import { PlayCircle, Clock, Calendar, CheckCircle2, Video } from 'lucide-react';
+import { PlayCircle, Clock, Calendar, CheckCircle2, Video, List } from 'lucide-react';
 import VimeoPlayer from '../components/VimeoPlayer';
+import { WORKSHOPS } from '../constants/catalog';
 import './Workshops.css';
-
-const MOCK_WORKSHOPS = [
-  {
-    id: 1,
-    title: "#1 Real Talk: Filipe Canto - Gerente de Projetos",
-    description: "Um bate papo real sobre mercado, carreira e skills.",
-    duration: "Em breve",
-    date: "GRAVAÇÃO DISPONÍVEL",
-    category: "Real Talk",
-    isNew: true,
-    vimeoId: "76979871", // Placeholder até você ter o ID real
-    cover: "/images/filipe-canto.png",
-    timestamps: [] // Vazio até você separar os tempos
-  },
-  {
-    id: 2,
-    title: "Masterclass de Prototipagem",
-    description: "Dominando variáveis complexas e advanced components no Figma para entregar protótipos ultra-realistas.",
-    duration: "2h 10min",
-    date: "25 MAR",
-    category: "UI/UX",
-    isNew: false,
-    vimeoId: "267475148",
-    cover: "https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=800&auto=format&fit=crop",
-    timestamps: [
-      { time: "02:20", label: "Configuração do Documento" },
-      { time: "15:45", label: "Trabalhando com Variáveis" },
-      { time: "55:10", label: "Maturidade em Design System" }
-    ]
-  },
-  {
-    id: 3,
-    title: "Entrando em Deep Work",
-    description: "Como hackear seu fluxo de trabalho e atingir a concentração absoluta no home-office moderno.",
-    duration: "1h 05min",
-    date: "12 PEV",
-    category: "Produtividade",
-    isNew: false,
-    vimeoId: "824804225",
-    cover: "https://images.unsplash.com/photo-1593642532744-d377ab507dc8?q=80&w=800&auto=format&fit=crop",
-    timestamps: [
-      { time: "00:00", label: "O que é Deep Work" },
-      { time: "30:00", label: "Regras do Bloqueio de Timpo" }
-    ]
-  }
-];
 
 const Workshops = () => {
   const [activeFilter, setActiveFilter] = useState('Todos');
   const [playingVideoId, setPlayingVideoId] = useState(null);
   const [seekTo, setSeekTo] = useState(null);
 
-  const handleTimeJump = (time, videoId) => {
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleTimeJump = (seconds, videoId) => {
     if (playingVideoId !== videoId) {
       setPlayingVideoId(videoId);
     }
-    setSeekTo(time);
-    // Reset seekTo after a bit to allow re-clicking same timestamp
-    setTimeout(() => setSeekTo(null), 500);
+    setSeekTo(seconds);
+    // Pequeno delay para garantir que o estado seja processado
+    setTimeout(() => setSeekTo(null), 1000);
   };
 
-  const heroWorkshop = MOCK_WORKSHOPS[0];
-  const gridWorkshops = MOCK_WORKSHOPS.slice(1);
+  const heroWorkshop = WORKSHOPS[0];
+  const gridWorkshops = WORKSHOPS.slice(1);
 
   return (
     <div className="page-container workshops-page">
@@ -84,18 +45,18 @@ const Workshops = () => {
                   seekTo={seekTo}
                 />
              ) : (
-               <>
-                <img src={heroWorkshop.cover} alt={heroWorkshop.title} className="hero-cover" />
-                <div className="hero-overlay"></div>
-                {heroWorkshop.isNew && (
-                  <div className="badge-new">
-                    <Video size={14} /> <span>NOVO ENCONTRO</span>
-                  </div>
-                )}
-                <button className="btn-hero-play" onClick={() => setPlayingVideoId(heroWorkshop.vimeoId)}>
-                    <PlayCircle size={64} strokeWidth={1.5} />
-                </button>
-               </>
+                <div className="hero-poster">
+                  <img src={heroWorkshop.cover} alt={heroWorkshop.title} className="hero-cover" />
+                  <div className="hero-overlay"></div>
+                  {heroWorkshop.isNew && (
+                    <div className="badge-new">
+                      <Video size={14} /> <span>NOVO ENCONTRO</span>
+                    </div>
+                  )}
+                  <button className="btn-hero-play" onClick={() => setPlayingVideoId(heroWorkshop.vimeoId)}>
+                      <PlayCircle size={64} strokeWidth={1.5} />
+                  </button>
+                </div>
              )}
           </div>
           
@@ -105,19 +66,28 @@ const Workshops = () => {
               <span className="info-pill highlight"><Calendar size={14} /> {heroWorkshop.date}</span>
             </div>
             
-            <h2>{heroWorkshop.title}</h2>
+            <div className="title-area">
+                <h2>{heroWorkshop.title}</h2>
+                <span className="subtitle">{heroWorkshop.subtitle}</span>
+            </div>
+            
             <p className="description">{heroWorkshop.description}</p>
             
-            <div className="timestamps-box">
-              <h4>Momentos Chave:</h4>
-              <div className="time-chips">
+            <div className="timestamps-box glass-card">
+              <div className="ts-header">
+                  <List size={18} className="text-primary" />
+                  <h4>Momentos Chave:</h4>
+              </div>
+              <div className="time-list">
                 {heroWorkshop.timestamps.map((ts, idx) => (
                   <button 
                     key={idx} 
-                    className="time-jump" 
-                    onClick={() => handleTimeJump(ts.time, heroWorkshop.vimeoId)}
+                    className="time-row" 
+                    onClick={() => handleTimeJump(ts.seconds, heroWorkshop.vimeoId)}
                   >
-                    <span className="time">{ts.time}</span> - {ts.label}
+                    <span className="ts-time">{formatTime(ts.seconds)}</span>
+                    <span className="ts-divider">—</span>
+                    <span className="ts-title">{ts.title}</span>
                   </button>
                 ))}
               </div>
@@ -125,20 +95,27 @@ const Workshops = () => {
           </div>
         </section>
 
-        {/* WORKSHOTS GRID TÍTULO */}
+        {/* LISTA SECUNDÁRIA */}
         <div className="section-divider">
-          <h3>Biblioteca Completa</h3>
+          <h3>Biblioteca de Masterclasses</h3>
         </div>
 
-        {/* GRID SECUNDÁRIO STATUS LIMPO */}
-        <section className="empty-state-clean">
-           <div className="empty-icon-clean">
-              <Video size={32} strokeWidth={1.5} />
-           </div>
-           <h4>Sua Biblioteca está em dia</h4>
-           <p>
-             Você não possui outras reuniões anteriores arquivadas em seu histórico atual. Fique ligado na agenda e assista acima à sua primeira aula masterclass ao vivo!
-           </p>
+        <section className="workshops-grid">
+          {gridWorkshops.map(ws => (
+            <div key={ws.id} className="ws-mini-card glass-card">
+              <div className="ws-mini-thumb">
+                <img src={ws.cover} alt={ws.title} />
+                <button className="btn-mini-play" onClick={() => setPlayingVideoId(ws.vimeoId)}>
+                  <Play size={16} fill="currentColor" />
+                </button>
+              </div>
+              <div className="ws-mini-info">
+                <span className="ws-cat">{ws.category}</span>
+                <h4>{ws.title}</h4>
+                <p>{ws.duration}</p>
+              </div>
+            </div>
+          ))}
         </section>
 
       </div>

@@ -229,17 +229,20 @@
   color: var(--color-primary);
   font-weight: 600;
   background-color: rgba(163, 230, 53, 0.1);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  letter-spacing: 0.1em;
 }
 
-/* SECTION DIVIDER */
-.section-divider {
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 24px;
-  margin-bottom: 32px;
+.ws-mini-info h4 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 4px 0 8px 0;
 }
+
+.ws-mini-info p {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
 .section-divider h3 {
   font-size: 24px;
   font-weight: 700;

@@ -3,37 +3,16 @@ import { Play, Lock, BookOpen, CheckCircle } from 'lucide-react';
 import VimeoPlayer from '../components/VimeoPlayer';
 import { supabase } from '../lib/supabase';
 import { useAppContext } from '../components/AppContext';
+import { COURSES } from '../constants/catalog';
 import './MyCourses.css';
 
 const MyCourses = () => {
   const { user } = useAppContext();
   const [activeLessonIndex, setActiveLessonIndex] = useState(0);
-  const [lessons, setLessons] = useState([
-    {
-      id: 'lesson-1',
-      vimeo_id: '76979871', // Vídeo teste clássico do Vimeo
-      title: 'Apresentação do Projeto',
-      duration: '10:45',
-      locked: false,
-      completed: false
-    },
-    {
-      id: 'lesson-2',
-      vimeo_id: '1025515286',
-      title: 'Instalação das Ferramentas',
-      duration: '15:20',
-      locked: false,
-      completed: false
-    },
-    {
-      id: 'lesson-3',
-      vimeo_id: '1025515286',
-      title: 'Primeiros Passos no Dashboard',
-      duration: '08:30',
-      locked: true,
-      completed: false
-    }
-  ]);
+  
+  // Pegamos o primeiro curso do catálogo como padrão (ajustável para múltiplos cursos)
+  const [currentCourse] = useState(COURSES[0]);
+  const [lessons, setLessons] = useState(currentCourse.lessons.map(l => ({ ...l, completed: false })));
 
   const activeLesson = lessons[activeLessonIndex];
 
@@ -62,7 +41,6 @@ const MyCourses = () => {
   }, [user]);
 
   const handleLessonCompletion = (vimeoId) => {
-    // Atualiza o estado visual instantaneamente
     setLessons(prev => prev.map(lesson => 
       lesson.vimeo_id === vimeoId ? { ...lesson, completed: true } : lesson
     ));
@@ -82,6 +60,8 @@ const MyCourses = () => {
     }
   };
 
+  const completedCount = lessons.filter(l => l.completed).length;
+  const coursePercent = Math.round((completedCount / lessons.length) * 100);
   const isModuleCompleted = lessons.length > 0 && lessons.every(l => l.completed);
 
   return (
@@ -100,27 +80,30 @@ const MyCourses = () => {
       <div className="course-layout">
         <div className="course-main">
           <header className="lesson-info">
-            <span className="module-tag">MÓDULO 01</span>
+            <span className="module-tag">{activeLesson.module || 'MÓDULO 01'}</span>
             <h1>{activeLesson.title}</h1>
-            <p className="lesson-meta">Aula {activeLessonIndex + 1} de {lessons.length} • {activeLesson.duration}</p>
+            <div className="course-progress-header">
+                <p className="lesson-meta">Aula {activeLessonIndex + 1} de {lessons.length} • {activeLesson.duration}</p>
+                <div className="progress-badge-main">{coursePercent}% CONCLUÍDO</div>
+            </div>
           </header>
 
           <div className="lesson-card glass-card">
             <div className="card-header">
-              <h3>Progresso da Aula</h3>
+              <h3>Status do Aprendizado</h3>
               <span className={activeLesson.completed ? 'status-done' : 'status-pending'}>
                 {activeLesson.completed ? 'Concluída' : 'Em progresso'}
               </span>
             </div>
             
             <p className="card-desc">
-              Esta é uma aula de teste para validarmos o funcionamento do player do Vimeo e o sistema de salvamento de progresso no banco de dados.
+              Você está assistindo ao curso <strong>{currentCourse.title}</strong>. Seu progresso é salvo automaticamente para que você possa continuar de onde parou em qualquer dispositivo.
             </p>
 
             {isModuleCompleted && (
               <div className="module-completion-banner">
                 <CheckCircle size={20} />
-                <span>Parabéns! Módulo concluído com sucesso. 🎉</span>
+                <span>Parabéns! Você completou este módulo. 🎉</span>
               </div>
             )}
 
@@ -144,7 +127,7 @@ const MyCourses = () => {
         </div>
 
         <aside className="course-sidebar">
-          <h3>Playlist do Módulo</h3>
+          <h3>Conteúdo do Curso</h3>
           <div className="playlist-list">
             {lessons.map((item, i) => (
               <div 
