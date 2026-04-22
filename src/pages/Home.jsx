@@ -61,9 +61,7 @@ const Home = () => {
                 {!m.locked && <button className="btn-module-action">Play</button>}
               </div>
             ))
-          ) : (
-            <p className="text-secondary" style={{ fontSize: '14px' }}>Nenhum encontro disponível no momento.</p>
-          )}
+          ) : null}
         </div>
       </section>
 
