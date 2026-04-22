@@ -15,6 +15,19 @@ const Home = () => {
     <div className="home-page">
       <header className="home-header">
         <h1>Bem-vindo, {firstName}</h1>
+
+        <div className="notice-banner glass-card">
+          <div className="notice-left">
+            <div className="notice-icon">🎬</div>
+            <div className="notice-text">
+              <span className="notice-badge">NOVO</span>
+              <p>Gravação disponível: <strong>Real Talk #1 com Filipe Canto</strong> sobre mercado e carreira.</p>
+            </div>
+          </div>
+          <button className="btn-notice" onClick={() => window.location.href = '/courses'}>
+            Assistir agora
+          </button>
+        </div>
       </header>
 
       {continueWatching.length > 0 ? (

@@ -5,11 +5,88 @@
   animation: fadeIn 0.5s ease-out;
 }
 
-.home-header h1 {
-  font-size: 56px;
-  font-weight: 700;
-  letter-spacing: -0.025em;
+.home-header {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.notice-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: linear-gradient(90deg, rgba(163, 230, 53, 0.05) 0%, rgba(163, 230, 53, 0.02) 100%);
+  border: 1px solid rgba(163, 230, 53, 0.2);
+  border-radius: 16px;
+  gap: 24px;
+}
+
+.notice-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.notice-icon {
+  font-size: 24px;
+  background: rgba(163, 230, 53, 0.1);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.notice-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notice-badge {
+  background-color: var(--color-primary);
+  color: #1a2e05;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.notice-text p {
+  font-size: 16px;
   color: var(--color-text-main);
+  margin: 0;
+}
+
+.btn-notice {
+  background-color: var(--color-primary);
+  color: #1a2e05;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: var(--transition-smooth);
+}
+
+.btn-notice:hover {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+  .notice-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .btn-notice {
+    width: 100%;
+  }
 }
 
 /* Bento Grid */
