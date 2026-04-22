@@ -104,18 +104,41 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
 
   const saveProgress = async () => {
     if (!playerRef.current || !user) return;
+    
     try {
       const currentTime = await playerRef.current.getCurrentTime();
-      await supabase
+      
+      // 1. Verificar se já existe um registro de progresso
+      const { data: existing } = await supabase
         .from('video_progress')
-        .upsert({
-          user_id: user.id,
-          video_id: videoId,
-          last_position_seconds: currentTime,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id, video_id' });
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('video_id', videoId)
+        .single();
+
+      if (existing) {
+        // 2. Se existe, usa .update() conforme o padrão do projeto
+        await supabase
+          .from('video_progress')
+          .update({
+            last_position_seconds: currentTime,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('user_id', user.id)
+          .eq('video_id', videoId);
+      } else {
+        // 3. Se não existe, usa .insert()
+        await supabase
+          .from('video_progress')
+          .insert({
+            user_id: user.id,
+            video_id: videoId,
+            last_position_seconds: currentTime,
+            updated_at: new Date().toISOString(),
+          });
+      }
     } catch (err) {
-      console.error('Erro ao salvar progresso:', err);
+      console.error('Background Sync Error:', err);
     }
   };
 
