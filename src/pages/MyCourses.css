@@ -195,35 +195,27 @@
   cursor: not-allowed;
 }
 
-.item-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-}
-
-.dot-done {
-  width: 8px;
-  height: 8px;
-  background-color: var(--color-primary);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--color-primary);
-}
-
-.dot-progress {
-  width: 8px;
-  height: 8px;
-  background-color: var(--color-text-secondary);
-  border-radius: 50%;
-}
-
-.item-info h4 {
+.status-done {
+  color: var(--color-primary);
+  font-weight: 700;
   font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 2px;
 }
 
-.item-info span {
-  font-size: 12px;
+.status-pending {
   color: var(--color-text-secondary);
+  font-size: 14px;
 }
+
+.icon-done {
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 5px var(--color-primary-soft));
+}
+
+.playlist-item.playing h4 {
+  color: var(--color-primary);
+}
+
+.playlist-item.locked h4 {
+  opacity: 0.5;
+}
+
