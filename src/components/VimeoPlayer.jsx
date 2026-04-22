@@ -2,21 +2,28 @@ import React, { useEffect, useRef, useState } from 'react';
 import Player from '@vimeo/player';
 import { supabase } from '../lib/supabase';
 import { useAppContext } from './AppContext';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
+import './VimeoPlayer.css';
 
 const VimeoPlayer = ({ videoId, title, seekTo }) => {
-  const containerRef = useRef(null);
+  const iframeRef = useRef(null);
   const playerRef = useRef(null);
   const { user } = useAppContext();
+  
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const saveInterval = useRef(null);
 
-  // Handle external seek requests
+  // Parâmetros do player recomendados (Vimeo Oficial)
+  const videoUrl = `https://player.vimeo.com/video/${videoId}?autoplay=0&byline=0&portrait=0&title=0&badge=0&autopause=0&player_id=0&app_id=58479`;
+
+  // Handle external seek requests (timestamps)
   useEffect(() => {
     if (playerRef.current && seekTo) {
       const seconds = parseTimeToSeconds(seekTo);
-      playerRef.current.setCurrentTime(seconds);
-      playerRef.current.play();
+      playerRef.current.setCurrentTime(seconds).then(() => {
+        playerRef.current.play();
+      }).catch(err => console.error('Erro ao buscar tempo:', err));
     }
   }, [seekTo]);
 
@@ -28,57 +35,56 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
   };
 
   useEffect(() => {
-    if (!containerRef.current || !user) return;
+    if (!iframeRef.current || !user) return;
 
-    const initPlayer = async () => {
-      // 1. Iniciar o Player do Vimeo
-      const player = new Player(containerRef.current, {
-        id: videoId,
-        responsive: true,
-        autoplay: false,
-      });
-      playerRef.current = player;
+    // Inicializa o SDK do Vimeo apontando para o iframe existente
+    const player = new Player(iframeRef.current);
+    playerRef.current = player;
 
+    const initProgress = async () => {
       try {
-        // 2. Buscar progresso anterior no Supabase
-        const { data, error } = await supabase
+        const { data, error: fetchError } = await supabase
           .from('video_progress')
           .select('last_position_seconds')
           .eq('user_id', user.id)
           .eq('video_id', videoId)
           .single();
 
-        if (!error && data) {
-          // 3. Se houver progresso, pular para o tempo salvo
+        if (!fetchError && data) {
           player.setCurrentTime(data.last_position_seconds);
         }
       } catch (err) {
-        console.warn('Erro ao buscar progresso:', err);
+        console.warn('Progresso não encontrado para este vídeo.');
       }
-
-      setLoading(false);
-
-      // 4. Configurar eventos de salvamento
-      player.on('play', () => {
-        startProgressSync();
-      });
-
-      player.on('pause', () => {
-        stopProgressSync();
-        saveProgress(); // Salva imediatamente ao pausar
-      });
-
-      player.on('ended', () => {
-        stopProgressSync();
-        markAsCompleted();
-      });
     };
 
-    initPlayer();
+    player.on('loaded', () => {
+      setLoading(false);
+      setError(false);
+      initProgress();
+    });
+
+    player.on('error', (data) => {
+      console.error('Erro no Player do Vimeo:', data);
+      setError(true);
+      setLoading(false);
+    });
+
+    player.on('play', () => startProgressSync());
+    player.on('pause', () => {
+      stopProgressSync();
+      saveProgress();
+    });
+    player.on('ended', () => {
+      stopProgressSync();
+      markAsCompleted();
+    });
 
     return () => {
       stopProgressSync();
-      if (playerRef.current) playerRef.current.destroy();
+      if (playerRef.current) {
+        playerRef.current.destroy();
+      }
     };
   }, [videoId, user]);
 
@@ -86,7 +92,7 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
     if (saveInterval.current) return;
     saveInterval.current = setInterval(() => {
       saveProgress();
-    }, 10000); // Sincroniza a cada 10 segundos
+    }, 10000);
   };
 
   const stopProgressSync = () => {
@@ -98,12 +104,9 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
 
   const saveProgress = async () => {
     if (!playerRef.current || !user) return;
-    
     try {
       const currentTime = await playerRef.current.getCurrentTime();
-      
-      // Upsert: Insere ou atualiza o progresso
-      const { error } = await supabase
+      await supabase
         .from('video_progress')
         .upsert({
           user_id: user.id,
@@ -111,10 +114,8 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
           last_position_seconds: currentTime,
           updated_at: new Date().toISOString(),
         }, { onConflict: 'user_id, video_id' });
-
-      if (error) console.error('Erro ao salvar progresso:', error);
     } catch (err) {
-      console.error('Falha ao obter tempo do player:', err);
+      console.error('Erro ao salvar progresso:', err);
     }
   };
 
@@ -128,13 +129,44 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
   };
 
   return (
-    <div className="vimeo-player-wrapper" style={{ position: 'relative', width: '100%', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#000' }}>
-      {loading && (
-        <div className="player-loader" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
-          <Loader2 className="spin" color="var(--color-primary)" />
-        </div>
-      )}
-      <div ref={containerRef} className="vimeo-container"></div>
+    <div className="vimeo-player-outer-wrapper">
+      <div className="vimeo-aspect-ratio-container">
+        {loading && (
+          <div className="vimeo-overlay-state">
+            <Loader2 className="vimeo-spin" size={32} color="var(--color-primary)" />
+            <span>Preparando vídeo...</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="vimeo-overlay-state error">
+            <AlertTriangle size={48} color="#f87171" />
+            <h3>Ocorreu um erro no Player</h3>
+            <p>Certifique-se que o domínio do projeto está autorizado nas configurações de privacidade do Vimeo.</p>
+            <button className="btn-retry" onClick={() => window.location.reload()}>
+              <RefreshCw size={16} /> Atualizar Página
+            </button>
+          </div>
+        )}
+
+        <iframe
+          ref={iframeRef}
+          src={videoUrl}
+          frameBorder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+          title={title}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            opacity: loading || error ? 0 : 1,
+            transition: 'opacity 0.3s ease'
+          }}
+        />
+      </div>
     </div>
   );
 };
