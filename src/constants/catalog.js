@@ -62,8 +62,8 @@ export const WORKSHOPS = [
     duration: "2h 10min",
     date: "25 MAR",
     category: "Masterclass",
-    createdAt: "2024-04-10T10:00:00.000Z", // Antigo (Badge NOVO não deve aparecer)
-    cover: "https://images.unsplash.com/photo-1581291518062-c03f27494382?q=80&w=800&auto=format&fit=crop",
+    createdAt: "2024-04-10T10:00:00.000Z",
+    cover: "https://images.unsplash.com/photo-1545235617-9465d2a55698?q=80&w=800&auto=format&fit=crop",
     timestamps: [
       { seconds: 140, title: "Configuração do Documento", description: "Estruturando camadas para protótipos." },
       { seconds: 945, title: "Trabalhando com Variáveis", description: "Lógica e condicionais no Figma." }
