@@ -6,19 +6,15 @@ import './Workshops.css';
 const MOCK_WORKSHOPS = [
   {
     id: 1,
-    title: "Estratégias de Growth em 2026",
-    description: "Desvende como os algoritmos operam atualmente e aplique os funis validados para crescer 10x mais rápido neste trimestre.",
-    duration: "1h 45min",
-    date: "Aconteceu HOJE",
-    category: "Liderança",
+    title: "#1 Real Talk: Filipe Canto - Gerente de Projetos",
+    description: "Um bate papo real sobre mercado, carreira e skills.",
+    duration: "Em breve",
+    date: "GRAVAÇÃO DISPONÍVEL",
+    category: "Real Talk",
     isNew: true,
-    vimeoId: "76979871",
+    vimeoId: "76979871", // Placeholder até você ter o ID real
     cover: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1200&auto=format&fit=crop",
-    timestamps: [
-      { time: "05:00", label: "Abertura do Evento" },
-      { time: "22:15", label: "Desconstruindo Funis" },
-      { time: "1:15:30", label: "Q&A com Participantes" }
-    ]
+    timestamps: [] // Vazio até você separar os tempos
   },
   {
     id: 2,
