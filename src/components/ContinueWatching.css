@@ -13,11 +13,12 @@
 
 .continue-thumb {
   position: relative;
-  width: 200px;
+  width: 240px;
   aspect-ratio: 16/9;
   border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .continue-thumb img {
@@ -30,11 +31,11 @@
 .thumb-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
+  opacity: 1; /* Garantir visibilidade do play */
   transition: opacity 0.3s ease;
 }
 

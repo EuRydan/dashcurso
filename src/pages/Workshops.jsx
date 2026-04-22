@@ -24,8 +24,17 @@ const Workshops = () => {
     setTimeout(() => setSeekTo(null), 1000);
   };
 
-  const heroWorkshop = WORKSHOPS[0];
-  const gridWorkshops = WORKSHOPS.slice(1);
+  const heroWorkshop = WORKSHOPS && WORKSHOPS.length > 0 ? WORKSHOPS[0] : null;
+  const gridWorkshops = WORKSHOPS && WORKSHOPS.length > 1 ? WORKSHOPS.slice(1) : [];
+
+  if (!heroWorkshop) {
+    return (
+      <div className="dash-loading">
+        <Video size={40} className="text-primary animate-pulse" />
+        <p>Carregando biblioteca...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container workshops-page">

@@ -8,7 +8,7 @@ export const COURSES = [
     id: 'course-master-ui',
     title: 'Mastering UI/UX Dashboard',
     slug: 'master-ui',
-    thumbnail: 'https://images.unsplash.com/photo-1586717791821-3f44a563eb4c?q=80&w=800&auto=format&fit=crop',
+    thumbnail: 'https://images.unsplash.com/photo-1541462608141-ad1557d44c02?q=80&w=800&auto=format&fit=crop',
     lessons: [
       {
         id: 'lesson-1',
@@ -45,7 +45,7 @@ export const WORKSHOPS = [
     duration: "1h 12min",
     date: "GRAVAÇÃO DISPONÍVEL",
     category: "Real Talk",
-    cover: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800&auto=format&fit=crop",
+    cover: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop",
     isNew: true,
     timestamps: [
       { seconds: 0, title: "Introdução e Carreira", description: "Início do papo e trajetória do Filipe." },
@@ -62,7 +62,7 @@ export const WORKSHOPS = [
     duration: "2h 10min",
     date: "25 MAR",
     category: "UI/UX",
-    cover: "https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=800&auto=format&fit=crop",
+    cover: "https://images.unsplash.com/photo-1581291518062-c03f27494382?q=80&w=800&auto=format&fit=crop",
     isNew: false,
     timestamps: [
       { seconds: 140, title: "Configuração do Documento", description: "Estruturando camadas para protótipos." },
