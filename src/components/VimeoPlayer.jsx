@@ -5,7 +5,7 @@ import { useAppContext } from './AppContext';
 import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 import './VimeoPlayer.css';
 
-const VimeoPlayer = ({ videoId, title, seekTo }) => {
+const VimeoPlayer = ({ videoId, title, seekTo, onCompletion }) => {
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
   const { user } = useAppContext();
@@ -13,9 +13,15 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const saveInterval = useRef(null);
+  const hasTriggeredCompletion = useRef(false);
 
   // Parâmetros do player recomendados (Vimeo Oficial)
   const videoUrl = `https://player.vimeo.com/video/${videoId}?autoplay=0&byline=0&portrait=0&title=0&badge=0&autopause=0&player_id=0&app_id=58479`;
+
+  // Reset completion trigger when videoId changes
+  useEffect(() => {
+    hasTriggeredCompletion.current = false;
+  }, [videoId]);
 
   // Handle external seek requests (timestamps)
   useEffect(() => {
@@ -70,6 +76,15 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
       setLoading(false);
     });
 
+    player.on('timeupdate', (data) => {
+      // Marcar como concluída ao atingir 90%
+      if (data.percent >= 0.9 && !hasTriggeredCompletion.current) {
+        hasTriggeredCompletion.current = true;
+        markAsCompleted();
+        if (onCompletion) onCompletion(videoId);
+      }
+    });
+
     player.on('play', () => startProgressSync());
     player.on('pause', () => {
       stopProgressSync();
@@ -104,11 +119,9 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
 
   const saveProgress = async () => {
     if (!playerRef.current || !user) return;
-    
     try {
       const currentTime = await playerRef.current.getCurrentTime();
       
-      // 1. Verificar se já existe um registro de progresso
       const { data: existing } = await supabase
         .from('video_progress')
         .select('id')
@@ -117,7 +130,6 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
         .single();
 
       if (existing) {
-        // 2. Se existe, usa .update() conforme o padrão do projeto
         await supabase
           .from('video_progress')
           .update({
@@ -127,7 +139,6 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
           .eq('user_id', user.id)
           .eq('video_id', videoId);
       } else {
-        // 3. Se não existe, usa .insert()
         await supabase
           .from('video_progress')
           .insert({
@@ -144,11 +155,17 @@ const VimeoPlayer = ({ videoId, title, seekTo }) => {
 
   const markAsCompleted = async () => {
     if (!user) return;
-    await supabase
-      .from('video_progress')
-      .update({ completed: true })
-      .eq('user_id', user.id)
-      .eq('video_id', videoId);
+    try {
+      await supabase
+        .from('video_progress')
+        .update({ completed: true })
+        .eq('user_id', user.id)
+        .eq('video_id', videoId);
+      
+      console.log(`[VimeoPlayer] Aula ${videoId} marcada como concluída (90%+)`);
+    } catch (err) {
+      console.error('Erro ao marcar como concluído:', err);
+    }
   };
 
   return (

@@ -37,7 +37,7 @@ const MyCourses = () => {
 
   const activeLesson = lessons[activeLessonIndex];
 
-  // Busca progresso de conclusão para marcar as bolinhas na barra lateral
+  // Busca progresso de conclusão inicial
   useEffect(() => {
     if (!user) return;
     
@@ -59,7 +59,30 @@ const MyCourses = () => {
     };
 
     fetchProgress();
-  }, [user, activeLessonIndex]);
+  }, [user]);
+
+  const handleLessonCompletion = (vimeoId) => {
+    // Atualiza o estado visual instantaneamente
+    setLessons(prev => prev.map(lesson => 
+      lesson.vimeo_id === vimeoId ? { ...lesson, completed: true } : lesson
+    ));
+  };
+
+  const handleNextLesson = () => {
+    if (activeLessonIndex < lessons.length - 1) {
+      setActiveLessonIndex(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handlePrevLesson = () => {
+    if (activeLessonIndex > 0) {
+      setActiveLessonIndex(prev => prev - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const isModuleCompleted = lessons.length > 0 && lessons.every(l => l.completed);
 
   return (
     <div className="course-page">
@@ -69,6 +92,7 @@ const MyCourses = () => {
             key={activeLesson.vimeo_id} 
             videoId={activeLesson.vimeo_id} 
             title={activeLesson.title} 
+            onCompletion={handleLessonCompletion}
           />
         </div>
       </section>
@@ -88,21 +112,30 @@ const MyCourses = () => {
                 {activeLesson.completed ? 'Concluída' : 'Em progresso'}
               </span>
             </div>
+            
             <p className="card-desc">
               Esta é uma aula de teste para validarmos o funcionamento do player do Vimeo e o sistema de salvamento de progresso no banco de dados.
             </p>
+
+            {isModuleCompleted && (
+              <div className="module-completion-banner">
+                <CheckCircle size={20} />
+                <span>Parabéns! Módulo concluído com sucesso. 🎉</span>
+              </div>
+            )}
+
             <div className="card-actions">
               <button 
                 className="btn-secondary" 
                 disabled={activeLessonIndex === 0}
-                onClick={() => setActiveLessonIndex(prev => prev - 1)}
+                onClick={handlePrevLesson}
               >
                 Aula Anterior
               </button>
               <button 
                 className="btn-primary"
                 disabled={activeLessonIndex === lessons.length - 1}
-                onClick={() => setActiveLessonIndex(prev => prev + 1)}
+                onClick={handleNextLesson}
               >
                 Próxima Aula
               </button>

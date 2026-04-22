@@ -237,3 +237,32 @@
   opacity: 0.5;
 }
 
+.module-completion-banner {
+  background: rgba(163, 230, 53, 0.08);
+  border: 1px solid rgba(163, 230, 53, 0.2);
+  color: var(--color-primary);
+  padding: 16px 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  margin-top: 8px;
+  animation: bannerSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes bannerSlideUp {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+  .lesson-card {
+    padding: 24px 16px;
+  }
+  
+  .lesson-info h1 {
+    font-size: 28px;
+  }
+}
