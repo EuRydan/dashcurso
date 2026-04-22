@@ -13,6 +13,7 @@ import Settings from './pages/Settings';
 import Premium from './pages/Premium';
 import Workshops from './pages/Workshops';
 import ResetPassword from './pages/ResetPassword';
+import ProtectedRoute from './components/ProtectedRoute';
 import { AppProvider } from './components/AppContext';
 import './index.css';
 
@@ -61,21 +62,6 @@ const DashboardLayout = () => {
   );
 };
 
-const AuthGuard = ({ children }) => {
-  const { user, loading } = useAppContext();
-  
-  if (loading) return (
-    <div className="loading-screen">
-       <Loader2 className="spin" size={40} color="var(--color-primary)" />
-    </div>
-  );
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
-};
-
 function App() {
   return (
     <AppProvider>
@@ -85,15 +71,17 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
         
-        {/* Protected Routes Wrapper */}
-        <Route element={<AuthGuard><DashboardLayout /></AuthGuard>}>
-          <Route path="/" element={<Home />} />
-          <Route path="/courses" element={<MyCourses />} />
-          <Route path="/workshops" element={<Workshops />} />
-          <Route path="/certificates" element={<Certificates />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/premium" element={<Premium />} />
+        {/* Protected Routes Group */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/courses" element={<MyCourses />} />
+            <Route path="/workshops" element={<Workshops />} />
+            <Route path="/certificates" element={<Certificates />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/premium" element={<Premium />} />
+          </Route>
         </Route>
         
         {/* Fallback */}
