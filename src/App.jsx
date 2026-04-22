@@ -13,6 +13,7 @@ import Settings from './pages/Settings';
 import Premium from './pages/Premium';
 import Workshops from './pages/Workshops';
 import ResetPassword from './pages/ResetPassword';
+import ForgotPassword from './pages/ForgotPassword';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AppProvider } from './components/AppContext';
 import './index.css';
@@ -69,6 +70,7 @@ function App() {
         <Routes>
           {/* Public Route */}
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
         
         {/* Protected Routes Group */}
